@@ -1,19 +1,52 @@
 from .Color import Color
+import pygame
+
+'''
+# Using Pattern "Mediator"
+'''
 
 
 class Drawer:
 
-    def __init__(self, screen, pg):
-        self.screen = screen
-        self.pg_obj = pg
+    def __init__(self, screen, sprite_drawer, wall_drawer):
+        pygame.display.set_caption("Pacman")
+        self._screen = screen
+        self._sprite_drawer = sprite_drawer
+        self._wall_drawer = wall_drawer
         ...  # TODO
+
+    def clear(self):
+        self._screen.fill(Color.BLACK)
+
+    def _draw_walls(self):
+        self._wall_drawer.draw(self._screen)
+
+    def _draw_sprites(self):
+        self._sprite_drawer.draw(self._screen)
+
+    def draw(self):
+        self._draw_walls()
+        self._draw_sprites()
+
+    def update(self):
+        pygame.display.update()
 
 
 class SpriteDrawer:
 
     def __init__(self, sprite):
-        super().__init__()
         self.sprite = sprite
 
-    def draw(self):
-        self.pg_obj.draw.rect(self.screen, Color.WHITE, (self.sprite.x, self.sprite.y, self.sprite.width, self.sprite.height))
+    def draw(self, screen):
+        screen.blit(self.sprite.current_state(), self.sprite.rect)
+
+
+class WallDrawer:
+
+    def __init__(self, field):
+        self.field = field
+
+    def draw(self, screen):
+        for row in self.field:
+            for wall in row:
+                screen.blit(wall.current_state(), wall.rect)
