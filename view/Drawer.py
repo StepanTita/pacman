@@ -24,8 +24,8 @@ class Drawer:
         self._sprite_drawer.draw(self._screen)
 
     def draw(self):
-        self._draw_walls()
         self._draw_sprites()
+        self._draw_walls()
 
     def update(self):
         pygame.display.update()

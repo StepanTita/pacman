@@ -2,10 +2,14 @@ import pygame
 
 import consts
 from enums import Mode
+from model.Controller.Controller import Controller
+from model.Controller.ScreenFieldMapper import ScreenFieldMapper
 from model.Events.MoveEvent import PacmanMoveEvent
 from model.Game import Game
+from model.Objects.Field import Field
 from model.Objects.Sprites.Sprite import Pacman
 from model.Objects.background.Wall import WallGenerator
+from model.Gameplay.Gameplay import Collider
 from view.Drawer import Drawer, SpriteDrawer, WallDrawer
 
 
@@ -17,7 +21,7 @@ class EventsInitializer:
 
 class FieldInitializer:
     def init_field(self):
-        return ...
+        return Field()
 
 
 class ObjectsInitializer:
@@ -66,5 +70,23 @@ class EnvironmentInitializer:
 
 class GameInitializer:
 
-    def init_game(self, screen, mode=Mode.PLAY):
-        return Game(screen_width=screen.get_width(), screen_height=screen.get_height(), mode=mode)
+    def init_game(self, mode=Mode.PLAY):
+        return Game(mode=mode)
+
+
+class ColliderInitializer:
+
+    def init_collider(self):
+        return Collider()
+
+
+class ControllerInitializer:
+
+    def init_controller(self, collider, screen_field_mapper):
+        return Controller(collider, screen_field_mapper)
+
+
+class ScreenFieldMapperInitializer:
+
+    def init_screen_field_mapper(self, screen, field):
+        return ScreenFieldMapper(screen, field)

@@ -3,7 +3,7 @@ from itertools import cycle
 import pygame
 from pygame.sprite import Group
 
-from model.dependencies.Dependencies import Dependencies
+from model.Dependencies.Dependencies import Dependencies
 from model.utils.Utils import Utils
 
 
@@ -43,7 +43,8 @@ class WallGenerator:
             Utils.crop_image(
                 base_img=Dependencies.load_img(wall_img),
                 x1=img_pos.x1, x2=img_pos.x2,
-                y1=img_pos.y1, y2=img_pos.y2
+                y1=img_pos.y1, y2=img_pos.y2,
+                w=img_pos.w, h=img_pos.h
             ), target_width=block_width, target_height=block_height
         )
         self._screen_width = screen_width
@@ -62,10 +63,10 @@ class WallGenerator:
         self.generate_walls(x1=0, x2=self._screen_width // self._block_width,
                             y1=0, y2=1)
         self.generate_walls(x1=0, x2=self._screen_width // self._block_width,
-                            y1=self._screen_height // self._block_height, y2=self._screen_height // self._block_height + 1)
+                            y1=self._screen_height // self._block_height - 1, y2=self._screen_height // self._block_height)
         self.generate_walls(x1=0, x2=1,
                             y1=0, y2=self._screen_height // self._block_height)
-        self.generate_walls(x1=self._screen_width // self._block_width, x2=self._screen_width // self._block_width + 1,
+        self.generate_walls(x1=self._screen_width // self._block_width - 1, x2=self._screen_width // self._block_width,
                             y1=0, y2=self._screen_height // self._block_height)
 
     def get_walls(self):

@@ -6,6 +6,6 @@ class Dependencies:
 
     @staticmethod
     def load_img(path):
-        return pygame.image.load(os.path.join(os.getcwd(), path))
+        return pygame.image.load(os.path.join(os.getcwd(), path)).convert_alpha()
 
 

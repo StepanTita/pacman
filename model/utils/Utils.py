@@ -3,8 +3,8 @@ import pygame
 
 class Utils:
     @staticmethod
-    def crop_image(base_img, x1=0, y1=0, x2=0, y2=0, w=128, h=128):
-        surfaces = [pygame.Surface((w, h)) for i in range((x2 - x1) * (y2 - y1))]
+    def crop_image(base_img, w, h, x1=0, y1=0, x2=1, y2=1):
+        surfaces = [pygame.Surface((w, h), pygame.SRCALPHA) for i in range((x2 - x1) * (y2 - y1))]
 
         range_x = list(range(x1, x2))
         range_y = list(range(y1, y2))
