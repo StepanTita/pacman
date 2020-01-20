@@ -8,7 +8,8 @@ from model.utils.Utils import Utils
 
 
 class Sprite(pygame.sprite.Sprite):
-    def __init__(self, img, img_pos, speed, x, y, width, height):
+
+    def __init__(self, img, img_pos, horizontal_speed, vertical_speed, x, y, width, height):
         pygame.sprite.Sprite.__init__(self)
 
         self.rect = pygame.Rect(x, y, width, height)
@@ -21,7 +22,8 @@ class Sprite(pygame.sprite.Sprite):
             ), target_width=width, target_height=height
         )
 
-        self.speed = speed
+        self.speed_horizontal = horizontal_speed
+        self.speed_vertical = vertical_speed
 
         self._states = cycle(self._images)
         self._current_state = None
@@ -30,6 +32,18 @@ class Sprite(pygame.sprite.Sprite):
         self.update_direction(Direction.LEFT)
 
         self.next_state()
+
+    def get_width(self):
+        return self.rect.width
+
+    def get_height(self):
+        return self.rect.height
+
+    def x(self):
+        return self.rect.x
+
+    def y(self):
+        return self.rect.y
 
     def move(self, dx=0, dy=0):
         self.rect.x += dx
@@ -55,16 +69,17 @@ class Sprite(pygame.sprite.Sprite):
         self.moving_direction = new_dir
         self._states = cycle(Utils.rotate_images(self._images, new_dir.value))
 
+    def get_rect(self):
+        return self.rect
+
 
 class Pacman(Sprite):
-    def __init__(self, img, img_pos, speed,
-                 x, y,
+    def __init__(self, img, img_pos, horizontal_speed, vertical_speed, x, y,
                  width, height):
-        super().__init__(img, img_pos, speed, x, y, width, height)
+        super().__init__(img, img_pos, horizontal_speed, vertical_speed, x, y, width, height)
 
 
 class Ghost(Sprite):
-    def __init__(self, img, img_pos, speed,
-                 x, y,
+    def __init__(self, img, img_pos, horizontal_speed, vertical_speed, x, y,
                  width, height):
-        super().__init__(img, img_pos, speed, x, y, width, height)
+        super().__init__(img, img_pos, horizontal_speed, vertical_speed, x, y, width, height)

@@ -1,0 +1,6 @@
+class Field:
+    def __init__(self, screen_width, screen_height, block_width, block_height):
+        self.field = ...
+
+    def fill_field(self):
+        ...

@@ -1,47 +1,30 @@
 import pygame
 
-from model.Events.MoveEvent import PacmanMoveEvent
-from model.utils.Cropper import Cropper
-from model.Objects.Sprites.Sprite import Pacman
-from enums import Mode, Direction
 import consts
-from view.Drawer import Drawer, SpriteDrawer, WallDrawer
+from enums import Mode, Direction
+from model.Events.MoveEvent import PacmanMoveEvent
 
 
 class Game:
-    def __init__(self, screen_width=consts.SCREEN_WIDTH, screen_height=consts.SCREEN_HEIGHT,
-                 block_width=consts.BLOCK_WIDTH, block_height=consts.BLOCK_HEIGHT, mode=Mode.PLAY):
-        pygame.init()
-        screen = pygame.display.set_mode((screen_width, screen_height))
-
-        self.block_width = block_width
-        self.block_height = block_height
-
-        self._field = [
-            [None for _ in range(screen_width // block_width)] for _ in range(screen_height // block_height)
-        ]
-
-        self._init_sprites()
-        self._init_walls()
-
-        self.mode = mode
-
-        self._drawer = Drawer(
-            screen=screen,
-            sprite_drawer=SpriteDrawer(self._pacman),
-            wall_drawer=WallDrawer(self.walls)
-        )
+    def __init__(self, screen_width, screen_height, mode):
+        self._mode = mode
         self._clock = pygame.time.Clock()
 
-    def _init_walls(self):
-        self.walls = []
+    def set_screen(self, screen):
+        self._screen = screen
 
-    def _init_sprites(self):
-        self._pacman = Pacman(img=consts.PACMAN, speed=consts.SPEED, img_pos=Cropper(x1=0, x2=consts.SPRITE_STATES,
-                                                                                     y1=0, y2=1),
-                              x=consts.BLOCK_WIDTH, y=consts.BLOCK_HEIGHT,
-                              width=self.block_width, height=self.block_height)
-        self._ghosts = ...  # TODO
+    def set_field(self, field):
+        self._field = field
+
+    def set_walls(self, walls):
+        self._walls = walls
+
+    def set_sprites(self, pacman, ghosts):
+        self._pacman = pacman
+        self._ghosts = ghosts
+
+    def set_drawer(self, drawer):
+        self._drawer = drawer
 
     def _auto_game(self):
         ...  # TODO
@@ -49,22 +32,22 @@ class Game:
     def _player_game(self):
         keyinput = pygame.key.get_pressed()
 
-        if keyinput[pygame.K_LEFT] and self._pacman.rect.x > 0:
+        if keyinput[pygame.K_LEFT] and self._pacman.x() > 0:
             if self._pacman.moving_direction != Direction.RIGHT:
                 self._pacman.update_direction(Direction.RIGHT)
-            self._pacman.move(dx=-self._pacman.speed)
-        elif keyinput[pygame.K_RIGHT] and self._pacman.rect.x < consts.SCREEN_WIDTH - self._pacman.rect.width:
+            self._pacman.move(dx=-self._pacman.speed_horizontal)
+        elif keyinput[pygame.K_RIGHT] and self._pacman.x() < consts.SCREEN_WIDTH - self._pacman.get_width():
             if self._pacman.moving_direction != Direction.LEFT:
                 self._pacman.update_direction(Direction.LEFT)
-            self._pacman.move(dx=self._pacman.speed)
-        elif keyinput[pygame.K_UP] and self._pacman.rect.y > 0:
+            self._pacman.move(dx=self._pacman.speed_horizontal)
+        elif keyinput[pygame.K_UP] and self._pacman.y() > 0:
             if self._pacman.moving_direction != Direction.UP:
                 self._pacman.update_direction(Direction.UP)
-            self._pacman.move(dy=-self._pacman.speed)
-        elif keyinput[pygame.K_DOWN] and self._pacman.rect.y < consts.SCREEN_HEIGHT - self._pacman.rect.height:
+            self._pacman.move(dy=-self._pacman.speed_vertical)
+        elif keyinput[pygame.K_DOWN] and self._pacman.y() < consts.SCREEN_HEIGHT - self._pacman.get_height():
             if self._pacman.moving_direction != Direction.BOT:
                 self._pacman.update_direction(Direction.BOT)
-            self._pacman.move(dy=self._pacman.speed)
+            self._pacman.move(dy=self._pacman.speed_vertical)
 
     def _process_events(self):
         active = True
@@ -88,7 +71,7 @@ class Game:
 
             # Check input
             # Move objects ...
-            if self.mode == Mode.AUTO:
+            if self._mode == Mode.AUTO:
                 self._auto_game()
             else:
                 self._player_game()

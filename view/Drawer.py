@@ -13,7 +13,6 @@ class Drawer:
         self._screen = screen
         self._sprite_drawer = sprite_drawer
         self._wall_drawer = wall_drawer
-        ...  # TODO
 
     def clear(self):
         self._screen.fill(Color.BLACK)
@@ -34,19 +33,19 @@ class Drawer:
 
 class SpriteDrawer:
 
-    def __init__(self, sprite):
+    def __init__(self, sprite, ghosts):
         self.sprite = sprite
 
     def draw(self, screen):
-        screen.blit(self.sprite.current_state(), self.sprite.rect)
+        screen.blit(self.sprite.current_state(), self.sprite.get_rect())
+        ...
 
 
 class WallDrawer:
 
-    def __init__(self, field):
-        self.field = field
+    def __init__(self, walls):
+        self._walls = walls
 
     def draw(self, screen):
-        for row in self.field:
-            for wall in row:
-                screen.blit(wall.current_state(), wall.rect)
+        for sprite in self._walls.sprites():
+            screen.blit(sprite.current_state(), sprite.get_rect())
