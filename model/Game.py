@@ -13,13 +13,6 @@ class Game:
     def set_screen_field_mapper(self, screen_field_mapper):
         self._screen_field_mapper = screen_field_mapper
 
-    def set_walls(self, walls):
-        self._walls = walls
-
-    def set_sprites(self, pacman, ghosts):
-        self._pacman = pacman
-        self._ghosts = ghosts
-
     def set_drawer(self, drawer):
         self._drawer = drawer
 
@@ -32,7 +25,7 @@ class Game:
             if event.type == pygame.QUIT:
                 active = False
             if event.type == PacmanMoveEvent.get_event_id():
-                self._pacman.next_state()
+                self._screen_field_mapper.get_pacman().next_state()
         return active
 
     def run(self):
@@ -51,7 +44,7 @@ class Game:
             if self._mode == Mode.AUTO:
                 self._controller.auto_game()
             else:
-                self._controller.player_game(self._pacman, self._walls)
+                self._controller.player_game(self._screen_field_mapper.get_pacman(), self._screen_field_mapper.get_walls())
 
             # Draw objects ...
             self._drawer.draw()

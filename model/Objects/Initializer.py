@@ -2,8 +2,8 @@ import pygame
 
 import consts
 from enums import Mode
-from model.Controller.Controller import Controller
-from model.Controller.ScreenFieldMapper import ScreenFieldMapper
+from Controller.Controller import Controller
+from Controller.ScreenFieldMapper import ScreenFieldMapper
 from model.Events.MoveEvent import PacmanMoveEvent
 from model.Game import Game
 from model.Objects.Field import Field
@@ -20,8 +20,8 @@ class EventsInitializer:
 
 
 class FieldInitializer:
-    def init_field(self):
-        return Field()
+    def init_field(self, pacman, ghosts, walls_generator):
+        return Field(pacman, ghosts, walls_generator)
 
 
 class ObjectsInitializer:
@@ -41,24 +41,20 @@ class ObjectsInitializer:
     def init_ghosts(self):
         return ...
 
-    def init_walls(self, wall_img=consts.WALLS, img_pos=consts.BASE_WALL_POS,
-                   screen_width=consts.SCREEN_WIDTH, screen_height=consts.SCREEN_HEIGHT,
-                   block_width=consts.BLOCK_WIDTH, block_height=consts.BLOCK_HEIGHT):
-        wall_generator = WallGenerator(wall_img=wall_img, img_pos=img_pos,
-                                       screen_width=screen_width, screen_height=screen_height,
-                                       block_width=block_width, block_height=block_height)
-        wall_generator.generate_frame()
-
-        return wall_generator.get_walls()
+    def init_walls_generator(self, wall_img=consts.WALLS, pos_img=consts.BASE_WALL_POS,
+                             block_width=consts.BLOCK_WIDTH, block_height=consts.BLOCK_HEIGHT):
+        walls_generator = WallGenerator(block_width, block_height)
+        walls_generator.init_images(wall_img, pos_img, block_width, block_height)
+        return walls_generator
 
 
 class DrawerInitializer:
 
-    def init_drawer(self, screen, pacman, ghosts, walls):
+    def init_drawer(self, screen, field):
         return Drawer(
             screen=screen,
-            sprite_drawer=SpriteDrawer(pacman, ghosts),
-            wall_drawer=WallDrawer(walls)
+            sprite_drawer=SpriteDrawer(field.get_pacman(), field.get_ghosts()),
+            wall_drawer=WallDrawer(field.get_walls())
         )
 
 
@@ -89,4 +85,5 @@ class ControllerInitializer:
 class ScreenFieldMapperInitializer:
 
     def init_screen_field_mapper(self, screen, field):
-        return ScreenFieldMapper(screen, field)
+        screen_field_mapper = ScreenFieldMapper(screen, field)
+        return screen_field_mapper

@@ -4,15 +4,14 @@ import pygame
 from pygame.sprite import Group
 
 from model.Dependencies.Dependencies import Dependencies
-from model.utils.Utils import Utils
+from model.Objects.Sprites.Sprite import FieldObject
+from model.utils.ImageUtils import ImageUtils
 
 
-class Wall(pygame.sprite.Sprite):
+class Wall(FieldObject):
 
     def __init__(self, images, x, y, width, height):
-        pygame.sprite.Sprite.__init__(self)
-
-        self.rect = pygame.Rect(x, y, width, height)
+        FieldObject.__init__(self, x, y, width, height)
 
         self._images = images
         self._states = cycle(self._images)
@@ -20,54 +19,54 @@ class Wall(pygame.sprite.Sprite):
 
         self.next_state()
 
-    def get_rect(self):
-        return self.rect
-
-    def current_state(self):
-        return self._current_state
-
-    def next_state(self):
-        self._current_state = next(self._states)
-
 
 class WallGenerator:
     """
     Builder Pattern
     """
 
-    def __init__(self, wall_img, img_pos,
-                 screen_width, screen_height,
-                 block_width, block_height):
+    def __init__(self, block_width, block_height):
+        self._walls = Group()
+        self.block_width = block_width
+        self.block_height = block_height
 
-        self._images = Utils.resize_images(
-            Utils.crop_image(
+    def init_images(self, wall_img, img_pos, block_width, block_height):
+        self._images = ImageUtils.resize_images(
+            ImageUtils.crop_image(
                 base_img=Dependencies.load_img(wall_img),
-                x1=img_pos.x1, x2=img_pos.x2,
-                y1=img_pos.y1, y2=img_pos.y2,
-                w=img_pos.w, h=img_pos.h
+                img_pos=img_pos
             ), target_width=block_width, target_height=block_height
         )
-        self._screen_width = screen_width
-        self._screen_height = screen_height
-        self._block_width = block_width
-        self._block_height = block_height
-        self._walls = Group()
 
-    def generate_walls(self, x1, y1, x2, y2):
-        for i in range(x1, x2):
-            for j in range(y1, y2):
-                self._walls.add(Wall(images=self._images, x=i * self._block_width, y=j * self._block_height,
-                                     width=self._block_width, height=self._block_height))
+    # def generate_walls(self, x1, y1, x2, y2, block_width, block_height):
+    #     for i in range(x1, x2):
+    #         for j in range(y1, y2):
+    #             self._walls.add(Wall(images=self._images, x=i * block_width, y=j * block_height,
+    #                                  width=block_width, height=block_height))
 
-    def generate_frame(self):
-        self.generate_walls(x1=0, x2=self._screen_width // self._block_width,
-                            y1=0, y2=1)
-        self.generate_walls(x1=0, x2=self._screen_width // self._block_width,
-                            y1=self._screen_height // self._block_height - 1, y2=self._screen_height // self._block_height)
-        self.generate_walls(x1=0, x2=1,
-                            y1=0, y2=self._screen_height // self._block_height)
-        self.generate_walls(x1=self._screen_width // self._block_width - 1, x2=self._screen_width // self._block_width,
-                            y1=0, y2=self._screen_height // self._block_height)
+    # def generate_frame(self, rows_count, cols_count, block_width, block_height):
+    #     self.generate_walls(x1=0, x2=cols_count,
+    #                         y1=0, y2=1,
+    #                         block_width=block_width, block_height=block_height)
+    #     self.generate_walls(x1=0, x2=cols_count,
+    #                         y1=rows_count - 1, y2=rows_count,
+    #                         block_width=block_width, block_height=block_height)
+    #     self.generate_walls(x1=0, x2=1,
+    #                         y1=0, y2=rows_count,
+    #                         block_width=block_width, block_height=block_height)
+    #     self.generate_walls(x1=cols_count - 1, x2=cols_count,
+    #                         y1=0, y2=rows_count,
+    #                         block_width=block_width, block_height=block_height)
+
+    def create_wall(self, row, col):
+        return Wall(images=self._images, x=col * self.block_width, y=row * self.block_height,
+                    width=self.block_width, height=self.block_height)
+
+    def generate_walls(self, field):
+        for i in range(field.rows_count):
+            for j in range(field.cols_count):
+                if type(field[i][j]) is Wall:
+                    self._walls.add(field[i][j])
 
     def get_walls(self):
         return self._walls

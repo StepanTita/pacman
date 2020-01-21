@@ -11,3 +11,8 @@ class Direction(Enum):
     RIGHT = -90
     BOT = 180
     UP = 0
+
+
+class PseudoField(Enum):
+    PACMAN = 'P'
+    WALL = '#'

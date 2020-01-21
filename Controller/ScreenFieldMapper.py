@@ -10,6 +10,15 @@ class ScreenFieldMapper:
     def get_field(self):
         return self._field
 
+    def get_pacman(self):
+        return self._field.get_pacman()
+
+    def get_ghosts(self):
+        return self._field.get_ghosts()
+
+    def get_walls(self):
+        return self._field.get_walls()
+
     def get_screen_width(self):
         return self._screen.get_width()
 
