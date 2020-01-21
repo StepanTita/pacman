@@ -2,19 +2,26 @@ from enums import PseudoField
 
 
 class Field:
-    def __init__(self, pacman, ghosts, walls_generator):
-        self.pacman = pacman
-        self.ghosts = ghosts
-        self.walls_generator = walls_generator
+    def __init__(self, pacman, ghosts, walls_generator, coins_generator):
+        self._pacman = pacman
+        self._ghosts = ghosts
+        self._walls_generator = walls_generator
+        self._coins_generator = coins_generator
+
+    def get_container(self):
+        return self.get_walls(), self.get_coins()
 
     def get_pacman(self):
-        return self.pacman
+        return self._pacman
 
     def get_ghosts(self):
-        return self.ghosts
+        return self._ghosts
 
     def get_walls(self):
-        return self.walls_generator.get_walls()
+        return self._walls_generator.get_field_objects()
+
+    def get_coins(self):
+        return self._coins_generator.get_field_objects()
 
     def fill(self, cols_count, rows_count, pseudo_field):
 
@@ -25,9 +32,12 @@ class Field:
         for i in range(rows_count):
             for j in range(cols_count):
                 if pseudo_field[i][j] == PseudoField.WALL.value:
-                    self._field[i][j] = self.walls_generator.create_wall(i, j)
+                    self._field[i][j] = self._walls_generator.create(i, j)
+                elif pseudo_field[i][j] == PseudoField.COIN.value:
+                    self._field[i][j] = self._coins_generator.create(i, j)
 
-        self.walls_generator.generate_walls(self)
+        self._walls_generator.generate(self)
+        self._coins_generator.generate(self)
 
     def __getitem__(self, i):
         return self._field[i]

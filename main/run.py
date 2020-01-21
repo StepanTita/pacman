@@ -3,7 +3,7 @@ import pygame
 import consts
 from enums import Mode
 from model.Dependencies.Dependencies import Dependencies
-from model.Objects.Initializer import GameInitializer, EnvironmentInitializer, ObjectsInitializer, DrawerInitializer, \
+from main.Initializer import GameInitializer, EnvironmentInitializer, ObjectsInitializer, DrawerInitializer, \
     FieldInitializer, EventsInitializer, ColliderInitializer, ScreenFieldMapperInitializer, ControllerInitializer
 from model.utils.ImageUtils import FileUtils
 
@@ -22,11 +22,12 @@ if __name__ == '__main__':
     pacman = objects_initializer.init_pacman()
     ghosts = objects_initializer.init_ghosts()
     walls_generator = objects_initializer.init_walls_generator()
+    coins_generator = objects_initializer.init_coins_generator()
 
     # Init field
     rows_count, cols_count, pseudo_field = FileUtils.lines_to_field(Dependencies.load_file(consts.FIELD_NAME))
     field_initializer = FieldInitializer()
-    field = field_initializer.init_field(pacman, ghosts, walls_generator)
+    field = field_initializer.init_field(pacman, ghosts, walls_generator, coins_generator)
     field.fill(rows_count=rows_count, cols_count=cols_count, pseudo_field=pseudo_field)
 
     # Init screen field mapper

@@ -4,24 +4,25 @@ import consts
 from enums import Mode
 from Controller.Controller import Controller
 from Controller.ScreenFieldMapper import ScreenFieldMapper
-from model.Events.MoveEvent import PacmanMoveEvent
+from model.Events.MoveEvent import PacmanMoveEvent, CoinTossEvent
 from model.Game import Game
 from model.Objects.Field import Field
 from model.Objects.Sprites.Sprite import Pacman
-from model.Objects.background.Wall import WallGenerator
+from model.Objects.ObjectsGenerators.ObjectsGenerators import WallGenerator, CoinGenerator
 from model.Gameplay.Gameplay import Collider
-from view.Drawer import Drawer, SpriteDrawer, WallDrawer
+from view.Drawer import Drawer, SpriteDrawer, ContainerDrawer
 
 
 class EventsInitializer:
 
     def init_events(self):
         PacmanMoveEvent.create_event(consts.MOUTH_SPEED)
+        CoinTossEvent.create_event(consts.COIN_SPEED)
 
 
 class FieldInitializer:
-    def init_field(self, pacman, ghosts, walls_generator):
-        return Field(pacman, ghosts, walls_generator)
+    def init_field(self, pacman, ghosts, walls_generator, coins_generator):
+        return Field(pacman, ghosts, walls_generator, coins_generator)
 
 
 class ObjectsInitializer:
@@ -32,7 +33,7 @@ class ObjectsInitializer:
     def init_pacman(self, img=consts.PACMAN, img_pos=consts.BASE_SPRITE_POS,
                     horizontal_speed=consts.PACMAN_SPEED, vertical_speed=consts.PACMAN_SPEED,
                     x=consts.BLOCK_WIDTH, y=consts.BLOCK_HEIGHT,
-                    width=consts.BLOCK_WIDTH, height=consts.BLOCK_HEIGHT):
+                    width=consts.PACMAN_WIDTH, height=consts.PACMAN_HEIGHT):
         return Pacman(img=img, img_pos=img_pos,
                       horizontal_speed=horizontal_speed, vertical_speed=vertical_speed,
                       x=x, y=y,
@@ -41,11 +42,29 @@ class ObjectsInitializer:
     def init_ghosts(self):
         return ...
 
+    def _init_generator(self, GeneratorType, wall_img, pos_img,
+                        block_width, block_height,
+                        field_object_width, field_object_height):
+        field_objects_generator = GeneratorType(block_width, block_height, field_object_width, field_object_height)
+        field_objects_generator.init_images(wall_img, pos_img)
+        return field_objects_generator
+
     def init_walls_generator(self, wall_img=consts.WALLS, pos_img=consts.BASE_WALL_POS,
-                             block_width=consts.BLOCK_WIDTH, block_height=consts.BLOCK_HEIGHT):
-        walls_generator = WallGenerator(block_width, block_height)
-        walls_generator.init_images(wall_img, pos_img, block_width, block_height)
+                             block_width=consts.WALL_WIDTH, block_height=consts.WALL_HEIGHT,
+                             field_object_width=consts.WALL_WIDTH, field_object_height=consts.WALL_HEIGHT
+                             ):
+        walls_generator = self._init_generator(WallGenerator, wall_img, pos_img,
+                                               block_width, block_height,
+                                               field_object_width, field_object_height)
         return walls_generator
+
+    def init_coins_generator(self, wall_img=consts.COINS, pos_img=consts.BASE_COIN_POS,
+                             block_width=consts.BLOCK_WIDTH, block_height=consts.BLOCK_HEIGHT,
+                             field_object_width=consts.COIN_WIDTH, field_object_height=consts.COIN_HEIGHT):
+        coins_generator = self._init_generator(CoinGenerator, wall_img, pos_img,
+                                               block_width, block_height,
+                                               field_object_width, field_object_height)
+        return coins_generator
 
 
 class DrawerInitializer:
@@ -54,7 +73,7 @@ class DrawerInitializer:
         return Drawer(
             screen=screen,
             sprite_drawer=SpriteDrawer(field.get_pacman(), field.get_ghosts()),
-            wall_drawer=WallDrawer(field.get_walls())
+            container_drawer=ContainerDrawer(field.get_container())
         )
 
 

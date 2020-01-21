@@ -2,7 +2,7 @@ import pygame
 
 import consts
 from enums import Mode, Direction
-from model.Events.MoveEvent import PacmanMoveEvent
+from model.Events.MoveEvent import PacmanMoveEvent, CoinTossEvent
 
 
 class Game:
@@ -26,6 +26,8 @@ class Game:
                 active = False
             if event.type == PacmanMoveEvent.get_event_id():
                 self._screen_field_mapper.get_pacman().next_state()
+            elif event.type == CoinTossEvent.get_event_id():
+                self._screen_field_mapper.change_coins_state()
         return active
 
     def run(self):

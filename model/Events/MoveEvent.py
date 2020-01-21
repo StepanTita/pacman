@@ -25,3 +25,19 @@ class PacmanMoveEvent(MoveEvent):
     @staticmethod
     def get_event_id():
         return -1 if PacmanMoveEvent.__instance is None else PacmanMoveEvent.__instance.identifier
+
+
+class CoinTossEvent(MoveEvent):
+    __instance = None
+
+    def __init__(self, identifier, delay):
+        CoinTossEvent.__instance = self
+        super().__init__(identifier, delay)
+
+    @staticmethod
+    def create_event(delay, identifier=pygame.USEREVENT + 2):
+        return CoinTossEvent.__instance if CoinTossEvent.__instance else CoinTossEvent(identifier, delay)
+
+    @staticmethod
+    def get_event_id():
+        return -1 if CoinTossEvent.__instance is None else CoinTossEvent.__instance.identifier

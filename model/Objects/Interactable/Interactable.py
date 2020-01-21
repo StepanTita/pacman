@@ -3,8 +3,7 @@ from itertools import cycle
 from model.Objects.Sprites.Sprite import FieldObject
 
 
-class Wall(FieldObject):
-
+class Coin(FieldObject):
     def __init__(self, images, x, y, width, height):
         FieldObject.__init__(self, x, y, width, height)
 

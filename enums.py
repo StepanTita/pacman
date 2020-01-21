@@ -16,3 +16,4 @@ class Direction(Enum):
 class PseudoField(Enum):
     PACMAN = 'P'
     WALL = '#'
+    COIN = 'C'

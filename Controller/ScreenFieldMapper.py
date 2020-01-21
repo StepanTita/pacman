@@ -36,3 +36,8 @@ class ScreenFieldMapper:
 
     def down_screen_border(self):
         return self.get_screen_height()
+
+    def change_coins_state(self):
+        for sprite in self._field.get_coins().sprites():
+            sprite.next_state()
+        return self._field.get_coins()
