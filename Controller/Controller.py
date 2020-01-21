@@ -81,4 +81,5 @@ class Controller:
             collided = self._collider.check_collisions(sprite, obstacles)
             if collided:
                 sprite.discard_move()
-        return
+            return collided
+        return False

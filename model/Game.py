@@ -30,6 +30,11 @@ class Game:
                 self._screen_field_mapper.change_coins_state()
         return active
 
+    def _check_collisions(self):
+        if not self._controller.player_game(self._screen_field_mapper.get_pacman(),
+                                            self._screen_field_mapper.get_walls()):
+            self._controller.player_game(self._screen_field_mapper.get_pacman(), self._screen_field_mapper.get_coins())
+
     def run(self):
         active = True
         while active:
@@ -46,7 +51,7 @@ class Game:
             if self._mode == Mode.AUTO:
                 self._controller.auto_game()
             else:
-                self._controller.player_game(self._screen_field_mapper.get_pacman(), self._screen_field_mapper.get_walls())
+                self._check_collisions()
 
             # Draw objects ...
             self._drawer.draw()

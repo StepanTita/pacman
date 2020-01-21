@@ -25,6 +25,6 @@ BASE_SPRITE_POS = ImagePosition(x1=0, x2=4, y1=0, y2=1, w=128, h=128)
 BASE_WALL_POS = ImagePosition(x1=5, x2=6, y1=3, y2=4, w=63, h=63)
 BASE_COIN_POS = ImagePosition(x1=0, x2=5, y1=0, y2=1, w=200, h=250)
 # --------- SPEED ------------
-PACMAN_SPEED = BLOCK_SIZE // 10
+PACMAN_SPEED = BLOCK_SIZE // 16
 MOUTH_SPEED = 110
 COIN_SPEED = 100

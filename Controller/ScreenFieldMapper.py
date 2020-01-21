@@ -19,6 +19,9 @@ class ScreenFieldMapper:
     def get_walls(self):
         return self._field.get_walls()
 
+    def get_coins(self):
+        return self._field.get_coins()
+
     def get_screen_width(self):
         return self._screen.get_width()
 
@@ -41,3 +44,6 @@ class ScreenFieldMapper:
         for sprite in self._field.get_coins().sprites():
             sprite.next_state()
         return self._field.get_coins()
+
+    def get_container(self):
+        return self._field.get_container()

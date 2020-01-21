@@ -17,3 +17,4 @@ class PseudoField(Enum):
     PACMAN = 'P'
     WALL = '#'
     COIN = 'C'
+    GHOST = 'G'

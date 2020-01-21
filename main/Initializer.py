@@ -7,8 +7,7 @@ from Controller.ScreenFieldMapper import ScreenFieldMapper
 from model.Events.MoveEvent import PacmanMoveEvent, CoinTossEvent
 from model.Game import Game
 from model.Objects.Field import Field
-from model.Objects.Sprites.Sprite import Pacman
-from model.Objects.ObjectsGenerators.ObjectsGenerators import WallGenerator, CoinGenerator
+from model.Objects.ObjectsGenerators.ObjectsGenerators import WallGenerator, CoinGenerator, PacmanGenerator
 from model.Gameplay.Gameplay import Collider
 from view.Drawer import Drawer, SpriteDrawer, ContainerDrawer
 
@@ -21,8 +20,8 @@ class EventsInitializer:
 
 
 class FieldInitializer:
-    def init_field(self, pacman, ghosts, walls_generator, coins_generator):
-        return Field(pacman, ghosts, walls_generator, coins_generator)
+    def init_field(self, pacman_generator, ghosts_generator, walls_generator, coins_generator):
+        return Field(pacman_generator, ghosts_generator, walls_generator, coins_generator)
 
 
 class ObjectsInitializer:
@@ -30,41 +29,50 @@ class ObjectsInitializer:
     Pattern Factory Method
     """
 
-    def init_pacman(self, img=consts.PACMAN, img_pos=consts.BASE_SPRITE_POS,
-                    horizontal_speed=consts.PACMAN_SPEED, vertical_speed=consts.PACMAN_SPEED,
-                    x=consts.BLOCK_WIDTH, y=consts.BLOCK_HEIGHT,
-                    width=consts.PACMAN_WIDTH, height=consts.PACMAN_HEIGHT):
-        return Pacman(img=img, img_pos=img_pos,
-                      horizontal_speed=horizontal_speed, vertical_speed=vertical_speed,
-                      x=x, y=y,
-                      width=width, height=height)
+    def __init__(self, block_width=consts.BLOCK_WIDTH, block_height=consts.BLOCK_HEIGHT):
+        self._block_width = block_width
+        self._block_height = block_height
 
-    def init_ghosts(self):
-        return ...
-
-    def _init_generator(self, GeneratorType, wall_img, pos_img,
-                        block_width, block_height,
-                        field_object_width, field_object_height):
-        field_objects_generator = GeneratorType(block_width, block_height, field_object_width, field_object_height)
-        field_objects_generator.init_images(wall_img, pos_img)
+    def _init_static_generator(self, GeneratorType, img, pos_img,
+                               field_object_width, field_object_height):
+        field_objects_generator = GeneratorType(self._block_width, self._block_height,
+                                                field_object_width, field_object_height)
+        field_objects_generator.init_images(img, pos_img)
         return field_objects_generator
 
     def init_walls_generator(self, wall_img=consts.WALLS, pos_img=consts.BASE_WALL_POS,
-                             block_width=consts.WALL_WIDTH, block_height=consts.WALL_HEIGHT,
                              field_object_width=consts.WALL_WIDTH, field_object_height=consts.WALL_HEIGHT
                              ):
-        walls_generator = self._init_generator(WallGenerator, wall_img, pos_img,
-                                               block_width, block_height,
-                                               field_object_width, field_object_height)
+        walls_generator = self._init_static_generator(WallGenerator, wall_img, pos_img,
+                                                      field_object_width, field_object_height)
         return walls_generator
 
-    def init_coins_generator(self, wall_img=consts.COINS, pos_img=consts.BASE_COIN_POS,
-                             block_width=consts.BLOCK_WIDTH, block_height=consts.BLOCK_HEIGHT,
+    def init_coins_generator(self, coin_img=consts.COINS, pos_img=consts.BASE_COIN_POS,
                              field_object_width=consts.COIN_WIDTH, field_object_height=consts.COIN_HEIGHT):
-        coins_generator = self._init_generator(CoinGenerator, wall_img, pos_img,
-                                               block_width, block_height,
-                                               field_object_width, field_object_height)
+        coins_generator = self._init_static_generator(CoinGenerator, coin_img, pos_img,
+                                                      field_object_width, field_object_height)
         return coins_generator
+
+    def _init_moveable_generator(self, GeneratorType, img, pos_img,
+                                 field_object_width, field_object_height,
+                                 horizontal_speed, vertical_speed):
+        field_objects_generator = GeneratorType(self._block_width, self._block_height,
+                                                field_object_width, field_object_height,
+                                                horizontal_speed, vertical_speed,)
+        field_objects_generator.init_images(img, pos_img)
+        return field_objects_generator
+
+    def init_pacman_generator(self, pacman_img=consts.PACMAN, pos_img=consts.BASE_SPRITE_POS,
+                              horizontal_speed=consts.PACMAN_SPEED, vertical_speed=consts.PACMAN_SPEED,
+                              field_object_width=consts.PACMAN_WIDTH, field_object_height=consts.PACMAN_HEIGHT):
+        pacman_generator = self._init_moveable_generator(PacmanGenerator,
+                                                         pacman_img, pos_img,
+                                                         field_object_width, field_object_height,
+                                                         horizontal_speed, vertical_speed)
+        return pacman_generator
+
+    def init_ghosts_generator(self):
+        return ...
 
 
 class DrawerInitializer:
@@ -72,7 +80,7 @@ class DrawerInitializer:
     def init_drawer(self, screen, field):
         return Drawer(
             screen=screen,
-            sprite_drawer=SpriteDrawer(field.get_pacman(), field.get_ghosts()),
+            sprite_drawer=SpriteDrawer(field.get_pacman()),
             container_drawer=ContainerDrawer(field.get_container())
         )
 

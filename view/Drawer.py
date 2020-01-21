@@ -33,12 +33,11 @@ class Drawer:
 
 class SpriteDrawer:
 
-    def __init__(self, sprite, ghosts):
-        self.sprite = sprite
+    def __init__(self, sprite):
+        self._sprite = sprite
 
     def draw(self, screen):
-        screen.blit(self.sprite.current_state(), self.sprite.get_rect())
-        ...
+        screen.blit(self._sprite.current_state(), self._sprite.get_rect())
 
 
 class ContainerDrawer:

@@ -35,17 +35,12 @@ class FieldObject(pygame.sprite.Sprite):
 
 class Sprite(FieldObject):
 
-    def __init__(self, img, img_pos, horizontal_speed, vertical_speed, x, y, width, height):
+    def __init__(self, images, horizontal_speed, vertical_speed, x, y, width, height):
         FieldObject.__init__(self, x, y, width, height)
 
         self._old_rect = None
 
-        self._images = ImageUtils.resize_images(
-            ImageUtils.crop_image(
-                base_img=Dependencies.load_img(img),
-                img_pos=img_pos
-            ), target_width=width, target_height=height
-        )
+        self._images = images
 
         self.speed_horizontal = horizontal_speed
         self.speed_vertical = vertical_speed
@@ -108,12 +103,12 @@ class Sprite(FieldObject):
 
 
 class Pacman(Sprite):
-    def __init__(self, img, img_pos, horizontal_speed, vertical_speed, x, y,
+    def __init__(self, images, horizontal_speed, vertical_speed, x, y,
                  width, height):
-        super().__init__(img, img_pos, horizontal_speed, vertical_speed, x, y, width, height)
+        super().__init__(images, horizontal_speed, vertical_speed, x, y, width, height)
 
 
 class Ghost(Sprite):
-    def __init__(self, img, img_pos, horizontal_speed, vertical_speed, x, y,
+    def __init__(self, images, horizontal_speed, vertical_speed, x, y,
                  width, height):
-        super().__init__(img, img_pos, horizontal_speed, vertical_speed, x, y, width, height)
+        super().__init__(images, horizontal_speed, vertical_speed, x, y, width, height)
