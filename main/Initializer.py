@@ -4,10 +4,11 @@ import consts
 from enums import Mode
 from Controller.Controller import Controller
 from Controller.ScreenFieldMapper import ScreenFieldMapper
-from model.Events.MoveEvent import PacmanMoveEvent, CoinTossEvent
+from model.Events.MoveEvent import PacmanMoveEvent, CoinTossEvent, GhostAnimEvent
 from model.Game import Game
 from model.Objects.Field import Field
-from model.Objects.ObjectsGenerators.ObjectsGenerators import WallGenerator, CoinGenerator, PacmanGenerator
+from model.Objects.ObjectsGenerators.ObjectsGenerators import WallGenerator, CoinGenerator, PacmanGenerator, \
+    GhostGenerator
 from model.Gameplay.Gameplay import Collider
 from view.Drawer import Drawer, SpriteDrawer, ContainerDrawer
 
@@ -17,6 +18,7 @@ class EventsInitializer:
     def init_events(self):
         PacmanMoveEvent.create_event(consts.MOUTH_SPEED)
         CoinTossEvent.create_event(consts.COIN_SPEED)
+        GhostAnimEvent.create_event(consts.GHOST_ANIM_SPEED)
 
 
 class FieldInitializer:
@@ -34,10 +36,11 @@ class ObjectsInitializer:
         self._block_height = block_height
 
     def _init_static_generator(self, GeneratorType, img, pos_img,
-                               field_object_width, field_object_height):
+                               field_object_width, field_object_height, split_by=0):
         field_objects_generator = GeneratorType(self._block_width, self._block_height,
                                                 field_object_width, field_object_height)
-        field_objects_generator.init_images(img, pos_img)
+        field_objects_generator.init_images(img, pos_img, split_by)
+        field_objects_generator.set_type(0)
         return field_objects_generator
 
     def init_walls_generator(self, wall_img=consts.WALLS, pos_img=consts.BASE_WALL_POS,
@@ -55,11 +58,12 @@ class ObjectsInitializer:
 
     def _init_moveable_generator(self, GeneratorType, img, pos_img,
                                  field_object_width, field_object_height,
-                                 horizontal_speed, vertical_speed):
+                                 horizontal_speed, vertical_speed, split_by=0):
         field_objects_generator = GeneratorType(self._block_width, self._block_height,
                                                 field_object_width, field_object_height,
-                                                horizontal_speed, vertical_speed,)
-        field_objects_generator.init_images(img, pos_img)
+                                                horizontal_speed, vertical_speed)
+        field_objects_generator.init_images(img, pos_img, split_by)
+        field_objects_generator.set_type(0)
         return field_objects_generator
 
     def init_pacman_generator(self, pacman_img=consts.PACMAN, pos_img=consts.BASE_SPRITE_POS,
@@ -71,8 +75,14 @@ class ObjectsInitializer:
                                                          horizontal_speed, vertical_speed)
         return pacman_generator
 
-    def init_ghosts_generator(self):
-        return ...
+    def init_ghosts_generator(self, ghost_img=consts.GHOSTS, pos_img=consts.BASE_GHOST_POS,
+                              horizontal_speed=consts.GHOSTS_SPEED, vertical_speed=consts.GHOSTS_SPEED,
+                              field_object_width=consts.GHOST_WIDTH, field_object_height=consts.GHOST_HEIGHT):
+        ghosts_generator = self._init_moveable_generator(GhostGenerator,
+                                                         ghost_img, pos_img,
+                                                         field_object_width, field_object_height,
+                                                         horizontal_speed, vertical_speed, split_by=8)
+        return ghosts_generator
 
 
 class DrawerInitializer:

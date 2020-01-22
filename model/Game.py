@@ -2,7 +2,7 @@ import pygame
 
 import consts
 from enums import Mode, Direction
-from model.Events.MoveEvent import PacmanMoveEvent, CoinTossEvent
+from model.Events.MoveEvent import PacmanMoveEvent, CoinTossEvent, GhostAnimEvent
 
 
 class Game:
@@ -28,6 +28,8 @@ class Game:
                 self._screen_field_mapper.get_pacman().next_state()
             elif event.type == CoinTossEvent.get_event_id():
                 self._screen_field_mapper.change_coins_state()
+            elif event.type == GhostAnimEvent.get_event_id():
+                self._screen_field_mapper.change_ghosts_state()
         return active
 
     def _check_collisions(self):

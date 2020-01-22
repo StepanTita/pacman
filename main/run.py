@@ -5,7 +5,7 @@ from enums import Mode
 from model.Dependencies.Dependencies import Dependencies
 from main.Initializer import GameInitializer, EnvironmentInitializer, ObjectsInitializer, DrawerInitializer, \
     FieldInitializer, EventsInitializer, ColliderInitializer, ScreenFieldMapperInitializer, ControllerInitializer
-from model.utils.ImageUtils import FileUtils
+from model.utils.Utils import FileUtils
 
 if __name__ == '__main__':
 

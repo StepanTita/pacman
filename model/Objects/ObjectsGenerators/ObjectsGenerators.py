@@ -1,10 +1,12 @@
+from itertools import cycle
+
 from pygame.sprite import Group
 
 from model.Dependencies.Dependencies import Dependencies
 from model.Objects.Interactable.Interactable import Coin
-from model.Objects.Sprites.Sprite import Ghost, Pacman
+from model.Objects.Sprites.Sprite import Ghost, Pacman, SlowGhost, FastGhost, SleepingGhost, MutantGhost
 from model.Objects.background.Wall import Wall
-from model.utils.ImageUtils import ImageUtils
+from model.utils.Utils import ImageUtils, BaseUtils
 
 
 class MultipleObjectsGenerator:
@@ -33,38 +35,51 @@ class SingleObjectGenerator:
 
 class ObjectGenerator:
     def __init__(self, block_width, block_height,
-                 field_object_width, field_object_height, field_object_type):
+                 field_object_width, field_object_height, field_object_types):
         self._block_width = block_width
         self._block_height = block_height
         self._field_object_width = field_object_width
         self._field_object_height = field_object_height
-        self._field_object_type = field_object_type
+        self._field_object_types = field_object_types
+        self._field_object_type = self._field_object_types[0]
 
-    def init_images(self, img, img_pos):
-        self._images = ImageUtils.resize_images(
-            ImageUtils.crop_image(
+    def _read_images(self, img, img_pos):
+        return ImageUtils.crop_image(
                 base_img=Dependencies.load_img(img),
                 img_pos=img_pos
-            ), target_width=self._field_object_width, target_height=self._field_object_height
-        )
+            )
+
+    def init_images(self, img, img_pos, split_by=0):
+        images = self._read_images(img, img_pos)
+        self._split_images(images, split_by)
+
+    def _split_images(self, images, split_by=0):
+        if split_by == 0:
+            self._images = [images]
+        else:
+            self._images = BaseUtils.divide_chunks(images, split_by)
+
+    def set_type(self, type_id):
+        self._current_type = self._images[type_id]
+        self._field_object_type = self._field_object_types[type_id]
 
     def generate(self, field):
         for i in range(field.rows_count):
             for j in range(field.cols_count):
-                if type(field[i][j]) is self._field_object_type:
+                if type(field[i][j]) in self._field_object_types:
                     self._add(field[i][j])
 
 
 class MoveableObjectCreator(ObjectGenerator):
 
     def __init__(self, horizontal_speed, vertical_speed, block_width, block_height,
-                 field_object_width, field_object_height, field_object_type):
-        super().__init__(block_width, block_height, field_object_width, field_object_height, field_object_type)
+                 field_object_width, field_object_height, field_object_types):
+        super().__init__(block_width, block_height, field_object_width, field_object_height, field_object_types)
         self._horizontal_speed = horizontal_speed
         self._vertical_speed = vertical_speed
 
     def create(self, row, col):
-        return self._field_object_type(images=self._images,
+        return self._field_object_type(images=self._current_type,
                                        horizontal_speed=self._horizontal_speed, vertical_speed=self._vertical_speed,
                                        x=col * self._block_width, y=row * self._block_height,
                                        width=self._field_object_width, height=self._field_object_height)
@@ -73,11 +88,11 @@ class MoveableObjectCreator(ObjectGenerator):
 class StaticObjectCreator(ObjectGenerator):
 
     def __init__(self, block_width, block_height,
-                 field_object_width, field_object_height, field_object_type):
-        super().__init__(block_width, block_height, field_object_width, field_object_height, field_object_type)
+                 field_object_width, field_object_height, field_object_types):
+        super().__init__(block_width, block_height, field_object_width, field_object_height, field_object_types)
 
     def create(self, row, col):
-        return self._field_object_type(images=self._images,
+        return self._field_object_type(images=self._current_type,
                                        x=col * self._block_width, y=row * self._block_height,
                                        width=self._field_object_width, height=self._field_object_height)
 
@@ -89,7 +104,7 @@ class PacmanGenerator(MoveableObjectCreator, SingleObjectGenerator):
         MoveableObjectCreator.__init__(self, horizontal_speed=horizontal_speed, vertical_speed=vertical_speed,
                                        block_width=block_width, block_height=block_height,
                                        field_object_width=field_object_width, field_object_height=field_object_height,
-                                       field_object_type=Pacman)
+                                       field_object_types=(Pacman, ))
         SingleObjectGenerator.__init__(self)
 
 
@@ -99,34 +114,14 @@ class WallGenerator(StaticObjectCreator, MultipleObjectsGenerator):
     """
 
     def __init__(self, block_width, block_height, field_object_width, field_object_height):
-        StaticObjectCreator.__init__(self, block_width, block_height, field_object_width, field_object_height, Wall)
+        StaticObjectCreator.__init__(self, block_width, block_height, field_object_width, field_object_height, (Wall, ))
         MultipleObjectsGenerator.__init__(self)
-
-    # def generate_walls(self, x1, y1, x2, y2, block_width, block_height):
-    #     for i in range(x1, x2):
-    #         for j in range(y1, y2):
-    #             self._walls.add(Wall(images=self._images, x=i * block_width, y=j * block_height,
-    #                                  width=block_width, height=block_height))
-
-    # def generate_frame(self, rows_count, cols_count, block_width, block_height):
-    #     self.generate_walls(x1=0, x2=cols_count,
-    #                         y1=0, y2=1,
-    #                         block_width=block_width, block_height=block_height)
-    #     self.generate_walls(x1=0, x2=cols_count,
-    #                         y1=rows_count - 1, y2=rows_count,
-    #                         block_width=block_width, block_height=block_height)
-    #     self.generate_walls(x1=0, x2=1,
-    #                         y1=0, y2=rows_count,
-    #                         block_width=block_width, block_height=block_height)
-    #     self.generate_walls(x1=cols_count - 1, x2=cols_count,
-    #                         y1=0, y2=rows_count,
-    #                         block_width=block_width, block_height=block_height)
 
 
 class CoinGenerator(StaticObjectCreator, MultipleObjectsGenerator):
 
     def __init__(self, block_width, block_height, field_object_width, field_object_height):
-        StaticObjectCreator.__init__(self, block_width, block_height, field_object_width, field_object_height, Coin)
+        StaticObjectCreator.__init__(self, block_width, block_height, field_object_width, field_object_height, (Coin, ))
         MultipleObjectsGenerator.__init__(self)
 
 
@@ -138,8 +133,5 @@ class GhostGenerator(MoveableObjectCreator, MultipleObjectsGenerator):
         MoveableObjectCreator.__init__(self, horizontal_speed=horizontal_speed, vertical_speed=vertical_speed,
                                        block_width=block_width, block_height=block_height,
                                        field_object_width=field_object_width, field_object_height=field_object_height,
-                                       field_object_type=Ghost)
+                                       field_object_types=(MutantGhost, SlowGhost, FastGhost, SleepingGhost))
         MultipleObjectsGenerator.__init__(self)
-
-    def init_images(self, img, img_pos):
-        self._images = super().init_images(img, img_pos)

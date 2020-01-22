@@ -1,4 +1,4 @@
-from enums import PseudoField
+from enums import PseudoField, GhostsTypes
 
 
 class Field:
@@ -9,7 +9,7 @@ class Field:
         self._coins_generator = coins_generator
 
     def get_container(self):
-        return self.get_walls(), self.get_coins()
+        return self.get_walls(), self.get_coins(), self.get_ghosts()
 
     def get_pacman(self):
         return self._pacman_generator.get_field_object()
@@ -37,13 +37,25 @@ class Field:
                     self._field[i][j] = self._coins_generator.create(i, j)
                 elif pseudo_field[i][j] == PseudoField.PACMAN.value:
                     self._field[i][j] = self._pacman_generator.create(i, j)
-                # elif pseudo_field[i][j] == PseudoField.GHOST.value:
-                #     self._field[i][j] = self._ghosts_generator.create(i, j)
+                elif pseudo_field[i][j] == PseudoField.GHOST.value:
+                    self._field[i][j] = self._ghosts_generator.create(i, j)
+                elif pseudo_field[i][j] == PseudoField.FAST_GHOST.value:
+                    self._ghosts_generator.set_type(GhostsTypes.FAST.value)
+                    self._field[i][j] = self._ghosts_generator.create(i, j)
+                elif pseudo_field[i][j] == PseudoField.SLOW_GHOST.value:
+                    self._ghosts_generator.set_type(GhostsTypes.SLOW.value)
+                    self._field[i][j] = self._ghosts_generator.create(i, j)
+                elif pseudo_field[i][j] == PseudoField.SLEEPING_GHOST.value:
+                    self._ghosts_generator.set_type(GhostsTypes.SLEEPING.value)
+                    self._field[i][j] = self._ghosts_generator.create(i, j)
+                elif pseudo_field[i][j] == PseudoField.MUTANT_GHOST.value:
+                    self._ghosts_generator.set_type(GhostsTypes.MUTANT.value)
+                    self._field[i][j] = self._ghosts_generator.create(i, j)
 
         self._pacman_generator.generate(self)
         self._walls_generator.generate(self)
         self._coins_generator.generate(self)
-        # self._ghosts_generator.generate(self)
+        self._ghosts_generator.generate(self)
 
     def __getitem__(self, i):
         return self._field[i]

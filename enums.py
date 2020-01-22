@@ -18,3 +18,14 @@ class PseudoField(Enum):
     WALL = '#'
     COIN = 'C'
     GHOST = 'G'
+    FAST_GHOST = 'F'
+    SLOW_GHOST = 'S'
+    SLEEPING_GHOST = 'Z'
+    MUTANT_GHOST = 'M'
+
+
+class GhostsTypes(Enum):
+    MUTANT = 0
+    SLOW = 1
+    FAST = 2
+    SLEEPING = 3

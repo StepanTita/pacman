@@ -41,3 +41,19 @@ class CoinTossEvent(MoveEvent):
     @staticmethod
     def get_event_id():
         return -1 if CoinTossEvent.__instance is None else CoinTossEvent.__instance.identifier
+
+
+class GhostAnimEvent(MoveEvent):
+    __instance = None
+
+    def __init__(self, identifier, delay):
+        GhostAnimEvent.__instance = self
+        super().__init__(identifier, delay)
+
+    @staticmethod
+    def create_event(delay, identifier=pygame.USEREVENT + 3):
+        return GhostAnimEvent.__instance if GhostAnimEvent.__instance else GhostAnimEvent(identifier, delay)
+
+    @staticmethod
+    def get_event_id():
+        return -1 if GhostAnimEvent.__instance is None else GhostAnimEvent.__instance.identifier

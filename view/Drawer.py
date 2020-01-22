@@ -1,3 +1,4 @@
+from model.Objects.Sprites.Sprite import MutantGhost
 from .Color import Color
 import pygame
 

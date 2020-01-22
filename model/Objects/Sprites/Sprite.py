@@ -4,7 +4,7 @@ import pygame
 
 from enums import Direction
 from model.Dependencies.Dependencies import Dependencies
-from model.utils.ImageUtils import ImageUtils
+from model.utils.Utils import ImageUtils
 
 
 def create_history(func):
@@ -17,7 +17,11 @@ def create_history(func):
 
 class FieldObject(pygame.sprite.Sprite):
 
-    def __init__(self, x, y, width, height):
+    def __init__(self, images, x, y, width, height):
+        self._images = ImageUtils.resize_images(images,
+                                          target_width=width,
+                                          target_height=height
+                                          )
         pygame.sprite.Sprite.__init__(self)
         self._rect = pygame.Rect(x, y, width, height)
         self._states = cycle([])
@@ -36,11 +40,9 @@ class FieldObject(pygame.sprite.Sprite):
 class Sprite(FieldObject):
 
     def __init__(self, images, horizontal_speed, vertical_speed, x, y, width, height):
-        FieldObject.__init__(self, x, y, width, height)
+        FieldObject.__init__(self, images, x, y, width, height)
 
         self._old_rect = None
-
-        self._images = images
 
         self.speed_horizontal = horizontal_speed
         self.speed_vertical = vertical_speed
@@ -50,7 +52,6 @@ class Sprite(FieldObject):
 
         self.old_moving_direction = None
         self.moving_direction = None
-        self.update_direction(Direction.RIGHT)
 
         self.next_state()
 
@@ -101,14 +102,68 @@ class Sprite(FieldObject):
     def discard_move(self):
         self._rect = self._old_rect
 
+    def speed_up(self, times):
+        self.speed_horizontal *= times
+        self.speed_vertical *= times
+
+    def increase(self, times):
+        self._rect.width *= times
+        self._rect.height *= times
+
+    def decrease(self, times):
+        self._rect.width //= times
+        self._rect.height //= times
+
 
 class Pacman(Sprite):
     def __init__(self, images, horizontal_speed, vertical_speed, x, y,
                  width, height):
         super().__init__(images, horizontal_speed, vertical_speed, x, y, width, height)
+        self.update_direction(Direction.RIGHT)
 
 
 class Ghost(Sprite):
     def __init__(self, images, horizontal_speed, vertical_speed, x, y,
                  width, height):
         super().__init__(images, horizontal_speed, vertical_speed, x, y, width, height)
+        count_states = len(self._images) // 4
+        self._up = cycle(self._images[:count_states])
+        self._right = cycle(self._images[count_states:2 * count_states])
+        self._down = cycle(self._images[2 * count_states:3 * count_states])
+        self._left = cycle(self._images[3 * count_states:])
+        self._states = self._left
+
+    def update_direction(self, new_dir):
+        self.moving_direction = new_dir
+        if new_dir == Direction.LEFT:
+            self._states = self._left
+        elif new_dir == Direction.RIGHT:
+            self._states = self._right
+        elif new_dir == Direction.UP:
+            self._states = self._up
+        elif new_dir == Direction.DOWN:
+            self._states = self._down
+
+
+class SlowGhost(Ghost):
+    def __init__(self, images, horizontal_speed, vertical_speed, x, y,
+                 width, height):
+        super().__init__(images, horizontal_speed // 2, vertical_speed // 2, x, y, width, height)
+
+
+class FastGhost(Ghost):
+    def __init__(self, images, horizontal_speed, vertical_speed, x, y,
+                 width, height):
+        super().__init__(images, horizontal_speed * 2, vertical_speed * 2, x, y, width, height)
+
+
+class SleepingGhost(Ghost):
+    def __init__(self, images, horizontal_speed, vertical_speed, x, y,
+                 width, height):
+        super().__init__(images, horizontal_speed, vertical_speed, x, y, width, height)
+
+
+class MutantGhost(Ghost):
+    def __init__(self, images, horizontal_speed, vertical_speed, x, y,
+                 width, height):
+        super().__init__(images, horizontal_speed, vertical_speed, x, y, width * 2, height * 2)
