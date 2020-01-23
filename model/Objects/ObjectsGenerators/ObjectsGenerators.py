@@ -4,7 +4,7 @@ from pygame.sprite import Group
 
 from model.Dependencies.Dependencies import Dependencies
 from model.Objects.Interactable.Interactable import Coin
-from model.Objects.Sprites.Sprite import Ghost, Pacman, SlowGhost, FastGhost, SleepingGhost, MutantGhost
+from model.Objects.Sprites.Sprite import Pacman, SlowGhost, FastGhost, SleepingGhost, MutantGhost
 from model.Objects.background.Wall import Wall
 from model.utils.Utils import ImageUtils, BaseUtils
 
@@ -45,9 +45,9 @@ class ObjectGenerator:
 
     def _read_images(self, img, img_pos):
         return ImageUtils.crop_image(
-                base_img=Dependencies.load_img(img),
-                img_pos=img_pos
-            )
+            base_img=Dependencies.load_img(img),
+            img_pos=img_pos
+        )
 
     def init_images(self, img, img_pos, split_by=0):
         images = self._read_images(img, img_pos)
@@ -82,7 +82,8 @@ class MoveableObjectCreator(ObjectGenerator):
         return self._field_object_type(images=self._current_type,
                                        horizontal_speed=self._horizontal_speed, vertical_speed=self._vertical_speed,
                                        x=col * self._block_width, y=row * self._block_height,
-                                       width=self._field_object_width, height=self._field_object_height)
+                                       width=self._field_object_width, height=self._field_object_height,
+                                       block_width=self._block_width, block_height=self._block_height)
 
 
 class StaticObjectCreator(ObjectGenerator):
@@ -94,7 +95,8 @@ class StaticObjectCreator(ObjectGenerator):
     def create(self, row, col):
         return self._field_object_type(images=self._current_type,
                                        x=col * self._block_width, y=row * self._block_height,
-                                       width=self._field_object_width, height=self._field_object_height)
+                                       width=self._field_object_width, height=self._field_object_height,
+                                       block_width=self._block_width, block_height=self._block_height)
 
 
 class PacmanGenerator(MoveableObjectCreator, SingleObjectGenerator):
@@ -104,7 +106,7 @@ class PacmanGenerator(MoveableObjectCreator, SingleObjectGenerator):
         MoveableObjectCreator.__init__(self, horizontal_speed=horizontal_speed, vertical_speed=vertical_speed,
                                        block_width=block_width, block_height=block_height,
                                        field_object_width=field_object_width, field_object_height=field_object_height,
-                                       field_object_types=(Pacman, ))
+                                       field_object_types=(Pacman,))
         SingleObjectGenerator.__init__(self)
 
 
@@ -114,14 +116,14 @@ class WallGenerator(StaticObjectCreator, MultipleObjectsGenerator):
     """
 
     def __init__(self, block_width, block_height, field_object_width, field_object_height):
-        StaticObjectCreator.__init__(self, block_width, block_height, field_object_width, field_object_height, (Wall, ))
+        StaticObjectCreator.__init__(self, block_width, block_height, field_object_width, field_object_height, (Wall,))
         MultipleObjectsGenerator.__init__(self)
 
 
 class CoinGenerator(StaticObjectCreator, MultipleObjectsGenerator):
 
     def __init__(self, block_width, block_height, field_object_width, field_object_height):
-        StaticObjectCreator.__init__(self, block_width, block_height, field_object_width, field_object_height, (Coin, ))
+        StaticObjectCreator.__init__(self, block_width, block_height, field_object_width, field_object_height, (Coin,))
         MultipleObjectsGenerator.__init__(self)
 
 
@@ -132,6 +134,7 @@ class GhostGenerator(MoveableObjectCreator, MultipleObjectsGenerator):
                  horizontal_speed, vertical_speed):
         MoveableObjectCreator.__init__(self, horizontal_speed=horizontal_speed, vertical_speed=vertical_speed,
                                        block_width=block_width, block_height=block_height,
-                                       field_object_width=field_object_width, field_object_height=field_object_height,
+                                       field_object_width=field_object_width,
+                                       field_object_height=field_object_height,
                                        field_object_types=(MutantGhost, SlowGhost, FastGhost, SleepingGhost))
         MultipleObjectsGenerator.__init__(self)

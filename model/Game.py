@@ -32,10 +32,14 @@ class Game:
                 self._screen_field_mapper.change_ghosts_state()
         return active
 
-    def _check_collisions(self):
+    def _player_game(self):
         if not self._controller.player_game(self._screen_field_mapper.get_pacman(),
                                             self._screen_field_mapper.get_walls()):
             self._controller.player_game(self._screen_field_mapper.get_pacman(), self._screen_field_mapper.get_coins())
+        self._controller.stupid_ghosts(self._screen_field_mapper.get_ghosts(), self._screen_field_mapper.get_walls())
+        self._controller.smart_ghosts(self._screen_field_mapper.get_pacman(),
+                                      self._screen_field_mapper.get_ghosts(),
+                                      self._screen_field_mapper.get_walls())
 
     def run(self):
         active = True
@@ -53,7 +57,7 @@ class Game:
             if self._mode == Mode.AUTO:
                 self._controller.auto_game()
             else:
-                self._check_collisions()
+                self._player_game()
 
             # Draw objects ...
             self._drawer.draw()

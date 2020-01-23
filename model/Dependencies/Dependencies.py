@@ -18,3 +18,13 @@ class Dependencies:
             for i in range(rows):
                 lines.append(file.readline())
         return lines
+
+    @staticmethod
+    def load_instructions(path):
+        lines = []
+        with open(path) as file:
+            first_row = file.readline()
+            rows = int(first_row)
+            for i in range(rows):
+                lines.append(file.readline().split())
+        return lines

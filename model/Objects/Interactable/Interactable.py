@@ -5,8 +5,8 @@ from model.utils.Utils import ImageUtils
 
 
 class Coin(FieldObject):
-    def __init__(self, images, x, y, width, height):
-        FieldObject.__init__(self, images, x, y, width, height)
+    def __init__(self, images, x, y, width, height, block_width, block_height):
+        FieldObject.__init__(self, images, x, y, width, height, block_width, block_height)
 
         self._states = cycle(self._images)
         self._current_state = None

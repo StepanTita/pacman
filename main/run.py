@@ -5,7 +5,7 @@ from enums import Mode
 from model.Dependencies.Dependencies import Dependencies
 from main.Initializer import GameInitializer, EnvironmentInitializer, ObjectsInitializer, DrawerInitializer, \
     FieldInitializer, EventsInitializer, ColliderInitializer, ScreenFieldMapperInitializer, ControllerInitializer
-from model.utils.Utils import FileUtils
+from model.utils.Utils import FileUtils, BaseUtils
 
 if __name__ == '__main__':
 
@@ -29,6 +29,10 @@ if __name__ == '__main__':
     field_initializer = FieldInitializer()
     field = field_initializer.init_field(pacman_generator, ghosts_generator, walls_generator, coins_generator)
     field.fill(rows_count=rows_count, cols_count=cols_count, pseudo_field=pseudo_field)
+    field.set_instructions(
+        BaseUtils.create_instructions(fast_ghost=Dependencies.load_instructions(path=consts.FAST_INSTRUCTIONS),
+                                      mutant_ghost=Dependencies.load_instructions(path=consts.MUTANT_INSTRUCTIONS))
+    )
 
     # Init screen field mapper
     screen_field_mapper_initializer = ScreenFieldMapperInitializer()

@@ -1,4 +1,5 @@
 from enums import PseudoField, GhostsTypes
+from model.Objects.Sprites.Sprite import FastGhost, MutantGhost
 
 
 class Field:
@@ -9,7 +10,7 @@ class Field:
         self._coins_generator = coins_generator
 
     def get_container(self):
-        return self.get_walls(), self.get_coins(), self.get_ghosts()
+        return (self.get_coins(), )
 
     def get_pacman(self):
         return self._pacman_generator.get_field_object()
@@ -22,6 +23,13 @@ class Field:
 
     def get_coins(self):
         return self._coins_generator.get_field_objects()
+
+    def set_instructions(self, named_instructions):
+        for ghost in self.get_ghosts():
+            if type(ghost) is FastGhost:
+                ghost.set_instructions(named_instructions['fast_ghost'])
+            elif type(ghost) is MutantGhost:
+                ghost.set_instructions(named_instructions['mutant_ghost'])
 
     def fill(self, cols_count, rows_count, pseudo_field):
 

@@ -1,6 +1,7 @@
 import pygame
 
 from enums import Direction
+from model.Objects.Sprites.Sprite import StupidGhost, SmartGhost
 
 
 class Controller:
@@ -56,12 +57,11 @@ class Controller:
         sprite.move(dy=-sprite.speed_vertical)
 
     def _move_down(self, sprite):
-        if sprite.moving_direction != Direction.BOT:
-            sprite.update_direction(Direction.BOT)
+        if sprite.moving_direction != Direction.DOWN:
+            sprite.update_direction(Direction.DOWN)
         sprite.move(dy=sprite.speed_vertical)
 
-    def _move(self, sprite):
-
+    def _move_sprite(self, sprite):
         if self._can_move_left(sprite):
             self._move_left(sprite)
         elif self._can_move_right(sprite):
@@ -71,15 +71,46 @@ class Controller:
         elif self._can_move_down(sprite):
             self._move_down(sprite)
 
+    def _move_ghost(self, ghost, next_step):
+        if next_step == Direction.LEFT:
+            self._move_left(ghost)
+        elif next_step == Direction.RIGHT:
+            self._move_right(ghost)
+        elif next_step == Direction.UP:
+            self._move_up(ghost)
+        elif next_step == Direction.DOWN:
+            self._move_down(ghost)
+
     def auto_game(self):
         ...  # TODO
 
     def player_game(self, sprite, obstacles):
         self._update_buttons()
         if self._any_control_key_pressed():
-            self._move(sprite)
-            collided = self._collider.check_collisions(sprite, obstacles)
+            self._move_sprite(sprite)
+            collided = self._collider.check_player_collisions(sprite, obstacles)
             if collided:
                 sprite.discard_move()
             return collided
         return False
+
+    def stupid_ghosts(self, ghosts, obstacles):
+        for ghost in ghosts:
+            if issubclass(type(ghost), StupidGhost):
+                self._move_ghost(ghost, ghost.current_step())
+            collided = self._collider.check_ghost_collisions(ghost, obstacles)
+            if collided:
+                ghost.discard_move()
+                ghost.next_step()
+
+    def smart_ghosts(self, sprite, ghosts, obstacles):
+        for ghost in ghosts:
+            if issubclass(type(ghost), SmartGhost):
+                collided = True
+                ghost.find_sprite(sprite)
+                while collided:
+                    self._move_ghost(ghost, ghost.next_way())
+                    collided = self._collider.check_ghost_collisions(ghost, obstacles)
+                    if not collided:
+                        break
+                    ghost.discard_move()

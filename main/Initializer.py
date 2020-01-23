@@ -2,15 +2,15 @@ import pygame
 
 import consts
 from enums import Mode
-from Controller.Controller import Controller
-from Controller.ScreenFieldMapper import ScreenFieldMapper
+from controller.Controller import Controller
+from controller.ScreenFieldMapper import ScreenFieldMapper
 from model.Events.MoveEvent import PacmanMoveEvent, CoinTossEvent, GhostAnimEvent
 from model.Game import Game
 from model.Objects.Field import Field
 from model.Objects.ObjectsGenerators.ObjectsGenerators import WallGenerator, CoinGenerator, PacmanGenerator, \
     GhostGenerator
 from model.Gameplay.Gameplay import Collider
-from view.Drawer import Drawer, SpriteDrawer, ContainerDrawer
+from view.Drawer import Drawer, SpriteDrawer, ContainerDrawer, GhostDrawer, WallDrawer
 
 
 class EventsInitializer:
@@ -91,7 +91,9 @@ class DrawerInitializer:
         return Drawer(
             screen=screen,
             sprite_drawer=SpriteDrawer(field.get_pacman()),
-            container_drawer=ContainerDrawer(field.get_container())
+            container_drawer=ContainerDrawer(field.get_container()),
+            ghost_drawer=GhostDrawer(field.get_ghosts()),
+            wall_drawer=WallDrawer(field.get_walls())
         )
 
 

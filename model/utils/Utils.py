@@ -1,5 +1,7 @@
 import pygame
 
+from enums import Direction
+
 
 class ImageUtils:
     @staticmethod
@@ -37,4 +39,20 @@ class BaseUtils:
         result = []
         for i in range(0, len(lst), n):
             result.append(lst[i:i + n])
+        return result
+
+    @staticmethod
+    def create_instructions(**kwargs):
+        instruction_map = {'<': Direction.LEFT,
+                           '>': Direction.RIGHT,
+                           '^': Direction.UP,
+                           'V': Direction.DOWN}
+
+        result = dict()
+
+        for key, instructions in kwargs.items():
+            result[key] = []
+            for instruction in instructions:
+                direction, times = instruction
+                result[key] += [instruction_map[direction]] * int(times)
         return result

@@ -9,7 +9,7 @@ class Mode(Enum):
 class Direction(Enum):
     LEFT = 90
     RIGHT = -90
-    BOT = 180
+    DOWN = 180
     UP = 0
 
 

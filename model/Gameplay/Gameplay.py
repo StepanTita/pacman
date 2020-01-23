@@ -9,7 +9,7 @@ class Collider:
                 return obstacle
         return None
 
-    def check_collisions(self, character, obstacles):
+    def check_player_collisions(self, character, obstacles):
         collision = self._has_collisions(character, obstacles)
         if collision is None:
             return False
@@ -18,5 +18,12 @@ class Collider:
         if type(collision) is Coin:
             obstacles.remove(collision)
             return False
+        return False
 
+    def check_ghost_collisions(self, ghost, obstacles):
+        collision = self._has_collisions(ghost, obstacles)
+        if collision is None:
+            return False
+        if type(collision) is Wall:
+            return True
         return False

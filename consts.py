@@ -29,10 +29,13 @@ BASE_WALL_POS = ImagePosition(x1=5, x2=6, y1=3, y2=4, w=63, h=63)
 BASE_COIN_POS = ImagePosition(x1=0, x2=5, y1=0, y2=1, w=200, h=250)
 BASE_GHOST_POS = ImagePosition(x1=0, x2=8, y1=4, y2=8, w=128, h=128)
 # --------- SPEED ------------
-PACMAN_SPEED = BLOCK_SIZE // 16
+PACMAN_SPEED = BLOCK_SIZE // 20
 GHOSTS_SPEED = PACMAN_SPEED // 2
 MOUTH_SPEED = 110
 COIN_SPEED = 100
 GHOST_ANIM_SPEED = 125
 # --------- DIFFERENT ------------
 GHOSTS_STATES = 8
+# --------- INSTRUCTIONS ------------
+FAST_INSTRUCTIONS = 'Instructions/fast_instructions.txt'
+MUTANT_INSTRUCTIONS = 'Instructions/mutant_instructions.txt'
