@@ -3,14 +3,15 @@ from model.Objects.Sprites.Sprite import FastGhost, MutantGhost
 
 
 class Field:
-    def __init__(self, pacman_generator, ghosts_generator, walls_generator, coins_generator):
+    def __init__(self, pacman_generator, ghosts_generator, walls_generator, coins_generator, points_generator):
         self._pacman_generator = pacman_generator
         self._ghosts_generator = ghosts_generator
         self._walls_generator = walls_generator
         self._coins_generator = coins_generator
+        self._points_generator = points_generator
 
     def get_container(self):
-        return (self.get_coins(), )
+        return self.get_coins(), self.get_points()
 
     def get_pacman(self):
         return self._pacman_generator.get_field_object()
@@ -23,6 +24,9 @@ class Field:
 
     def get_coins(self):
         return self._coins_generator.get_field_objects()
+
+    def get_points(self):
+        return self._points_generator.get_field_objects()
 
     def set_instructions(self, named_instructions):
         for ghost in self.get_ghosts():
@@ -43,6 +47,8 @@ class Field:
                     self._field[i][j] = self._walls_generator.create(i, j)
                 elif pseudo_field[i][j] == PseudoField.COIN.value:
                     self._field[i][j] = self._coins_generator.create(i, j)
+                elif pseudo_field[i][j] == PseudoField.POINT.value:
+                    self._field[i][j] = self._points_generator.create(i, j)
                 elif pseudo_field[i][j] == PseudoField.PACMAN.value:
                     self._field[i][j] = self._pacman_generator.create(i, j)
                 elif pseudo_field[i][j] == PseudoField.GHOST.value:
@@ -63,6 +69,7 @@ class Field:
         self._pacman_generator.generate(self)
         self._walls_generator.generate(self)
         self._coins_generator.generate(self)
+        self._points_generator.generate(self)
         self._ghosts_generator.generate(self)
 
     def __getitem__(self, i):

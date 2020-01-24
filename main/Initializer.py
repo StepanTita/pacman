@@ -6,11 +6,15 @@ from controller.Controller import Controller
 from controller.ScreenFieldMapper import ScreenFieldMapper
 from model.Events.MoveEvent import PacmanMoveEvent, CoinTossEvent, GhostAnimEvent
 from model.Game import Game
+from model.GameStatus.GameStatus import GameStatus
 from model.Objects.Field import Field
+from model.Objects.GameStatusBlocks.GameStatusBlocks import HealthStatusBlock, StatusText, ScoreStatusBlock, \
+    ScoreStatusTextBlock
 from model.Objects.ObjectsGenerators.ObjectsGenerators import WallGenerator, CoinGenerator, PacmanGenerator, \
-    GhostGenerator
+    GhostGenerator, PointGenerator
 from model.Gameplay.Gameplay import Collider
-from view.Drawer import Drawer, SpriteDrawer, ContainerDrawer, GhostDrawer, WallDrawer
+from model.Screen.CustomScreen import CustomScreen
+from view.Drawer import Drawer, SpriteDrawer, ContainerDrawer, GhostDrawer, WallDrawer, GameStatusDrawer
 
 
 class EventsInitializer:
@@ -22,8 +26,8 @@ class EventsInitializer:
 
 
 class FieldInitializer:
-    def init_field(self, pacman_generator, ghosts_generator, walls_generator, coins_generator):
-        return Field(pacman_generator, ghosts_generator, walls_generator, coins_generator)
+    def init_field(self, pacman_generator, ghosts_generator, walls_generator, coins_generator, points_generator):
+        return Field(pacman_generator, ghosts_generator, walls_generator, coins_generator, points_generator)
 
 
 class ObjectsInitializer:
@@ -56,6 +60,12 @@ class ObjectsInitializer:
                                                       field_object_width, field_object_height)
         return coins_generator
 
+    def init_points_generator(self, point_img=consts.POINTS, pos_img=consts.BASE_POINT_POS,
+                             field_object_width=consts.POINT_WIDTH, field_object_height=consts.POINT_HEIGHT):
+        points_generator = self._init_static_generator(PointGenerator, point_img, pos_img,
+                                                      field_object_width, field_object_height)
+        return points_generator
+
     def _init_moveable_generator(self, GeneratorType, img, pos_img,
                                  field_object_width, field_object_height,
                                  horizontal_speed, vertical_speed, split_by=0):
@@ -84,23 +94,56 @@ class ObjectsInitializer:
                                                          horizontal_speed, vertical_speed, split_by=8)
         return ghosts_generator
 
+    def _init_health(self, x, y, width, height):
+        health_text_block = StatusText(x + width // 16, y + height // 5, width, height, "Health: ")
+        health_blocks = [HealthStatusBlock(x + width * (i + 1), y - height // 6, width, height) for i in
+                         range(consts.HEALTH)]
+        for health_block in health_blocks:
+            health_block.init_health_image(heart_img=consts.HEART, heart_pos=consts.BASE_HEART_POS,
+                                           empty_heart_img=consts.EHEART, empty_heart_pos=consts.BASE_EHEART_POS)
+        return health_blocks, health_text_block
+
+    def _init_score(self, x, y, width, height):
+        point_block = ScoreStatusBlock(x, y, width, height)
+        point_block.init_image(img=consts.POINTS, img_pos=consts.BASE_POINT_POS)
+        point_text_block = ScoreStatusTextBlock(x + width - width // 4, y + height // 6, width, height)
+        coin_block = ScoreStatusBlock(x + 2 * width + width // 3, y + height // 4, width // 2, height // 2)
+        coin_block.init_image(img=consts.COINS, img_pos=consts.BASE_COIN_POS)
+        coin_text_block = ScoreStatusTextBlock(x + 3 * width, y + height // 6, width, height)
+
+        return point_block, point_text_block, coin_block, coin_text_block
+
+    def init_gamestatus(self, x, y, width, height):
+        health_blocks, health_text_block = self._init_health(x, y, width, height)
+
+        x += (consts.HEALTH + 1) * width
+
+        point_block, point_text_block, coin_block, coin_text_block = self._init_score(x, y, width, height)
+
+        gamestatus = GameStatus(consts.HEALTH,
+                                health_blocks, health_text_block,
+                                point_block, point_text_block,
+                                coin_block, coin_text_block)
+        return gamestatus
+
 
 class DrawerInitializer:
 
-    def init_drawer(self, screen, field):
+    def init_drawer(self, screen, field, gamestatus):
         return Drawer(
             screen=screen,
             sprite_drawer=SpriteDrawer(field.get_pacman()),
             container_drawer=ContainerDrawer(field.get_container()),
             ghost_drawer=GhostDrawer(field.get_ghosts()),
-            wall_drawer=WallDrawer(field.get_walls())
+            wall_drawer=WallDrawer(field.get_walls()),
+            gamestatus_drawer=GameStatusDrawer(gamestatus)
         )
 
 
 class EnvironmentInitializer:
 
-    def init_screen(self, width=consts.SCREEN_WIDTH, height=consts.SCREEN_HEIGHT):
-        return pygame.display.set_mode((width, height))
+    def init_screen(self, width, height, status_height=consts.BLOCK_HEIGHT):
+        return CustomScreen(pygame.display.set_mode((width, height + status_height)), status_height)
 
 
 class GameInitializer:

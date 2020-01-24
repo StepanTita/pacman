@@ -22,6 +22,9 @@ class ScreenFieldMapper:
     def get_coins(self):
         return self._field.get_coins()
 
+    def get_points(self):
+        return self._field.get_points()
+
     def get_screen_width(self):
         return self._screen.get_width()
 

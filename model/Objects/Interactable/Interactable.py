@@ -1,14 +1,16 @@
-from itertools import cycle
-
-from model.Objects.Sprites.Sprite import FieldObject
-from model.utils.Utils import ImageUtils
+from model.Objects.Sprites.Sprite import FieldObject, MiddledFieldObject
 
 
-class Coin(FieldObject):
+class Interactable(MiddledFieldObject):
     def __init__(self, images, x, y, width, height, block_width, block_height):
-        FieldObject.__init__(self, images, x, y, width, height, block_width, block_height)
+        MiddledFieldObject.__init__(self, images, x, y, width, height, block_width, block_height)
 
-        self._states = cycle(self._images)
-        self._current_state = None
 
-        self.next_state()
+class Coin(Interactable):
+    def __init__(self, images, x, y, width, height, block_width, block_height):
+        Interactable.__init__(self, images, x, y, width, height, block_width, block_height)
+
+
+class Point(Interactable):
+    def __init__(self, images, x, y, width, height, block_width, block_height):
+        Interactable.__init__(self, images, x, y, width, height, block_width, block_height)

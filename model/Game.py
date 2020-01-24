@@ -32,10 +32,21 @@ class Game:
                 self._screen_field_mapper.change_ghosts_state()
         return active
 
+    def _check_invincible(self):
+        pacman = self._screen_field_mapper.get_pacman()
+        if pacman.is_invinsible():
+            end_time = pygame.time.get_ticks()
+            pacman.check_invinsible(end_time)
+
+    def _check_statuses(self):
+        self._check_invincible()
+
     def _player_game(self):
         if not self._controller.player_game(self._screen_field_mapper.get_pacman(),
                                             self._screen_field_mapper.get_walls()):
             self._controller.player_game(self._screen_field_mapper.get_pacman(), self._screen_field_mapper.get_coins())
+            self._controller.player_game(self._screen_field_mapper.get_pacman(), self._screen_field_mapper.get_points())
+        self._controller.ghosts_player(self._screen_field_mapper.get_pacman(), self._screen_field_mapper.get_ghosts())
         self._controller.stupid_ghosts(self._screen_field_mapper.get_ghosts(), self._screen_field_mapper.get_walls())
         self._controller.smart_ghosts(self._screen_field_mapper.get_pacman(),
                                       self._screen_field_mapper.get_ghosts(),
@@ -44,7 +55,10 @@ class Game:
     def run(self):
         active = True
         while active:
-            self._clock.tick(50)
+            if consts.LEARNING:
+                self._clock.tick(100)
+            else:
+                self._clock.tick(100)
 
             # Process events
             active = self._process_events()
@@ -64,5 +78,7 @@ class Game:
 
             # Update the screen
             self._drawer.update()
+
+            self._check_statuses()
 
         pygame.quit()

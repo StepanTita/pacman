@@ -9,13 +9,14 @@ import pygame
 
 class Drawer:
 
-    def __init__(self, screen, sprite_drawer, container_drawer, ghost_drawer, wall_drawer):
+    def __init__(self, screen, sprite_drawer, container_drawer, ghost_drawer, wall_drawer, gamestatus_drawer):
         pygame.display.set_caption("Pacman")
         self._screen = screen
         self._sprite_drawer = sprite_drawer
         self._container_drawer = container_drawer
         self._ghost_drawer = ghost_drawer
         self._wall_drawer = wall_drawer
+        self.gamestatus_drawer = gamestatus_drawer
 
     def clear(self):
         self._screen.fill(Color.BLACK)
@@ -32,11 +33,15 @@ class Drawer:
     def _draw_walls(self):
         self._wall_drawer.draw(self._screen)
 
+    def _draw_gamestatus(self):
+        self.gamestatus_drawer.draw(self._screen)
+
     def draw(self):
         self._draw_container()
         self._draw_sprites()
         self._draw_ghosts()
         self._draw_walls()
+        self._draw_gamestatus()
 
     def update(self):
         pygame.display.update()
@@ -78,3 +83,22 @@ class WallDrawer:
     def draw(self, screen):
         for sprite in self._walls.sprites():
             screen.blit(sprite.current_state(), sprite.get_rect())
+
+
+class GameStatusDrawer:
+    def __init__(self, gamestatus):
+        self._gamestatus = gamestatus
+
+    def _draw_blocks(self, screen, blocks):
+        for block in blocks:
+            screen.blit(block.current_status(), block.get_rect())
+
+    def draw(self, screen):
+        health_blocks = self._gamestatus.get_current_health()
+        self._draw_blocks(screen, health_blocks)
+
+        score_blocks = self._gamestatus.get_current_score()
+        self._draw_blocks(screen, score_blocks)
+        #
+        # bonus_blocks = self._gamestatus.get_bonuses()
+        # self._draw_blocks(screen, bonus_blocks)

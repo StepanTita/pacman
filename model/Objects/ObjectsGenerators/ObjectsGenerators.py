@@ -3,7 +3,7 @@ from itertools import cycle
 from pygame.sprite import Group
 
 from model.Dependencies.Dependencies import Dependencies
-from model.Objects.Interactable.Interactable import Coin
+from model.Objects.Interactable.Interactable import Coin, Point
 from model.Objects.Sprites.Sprite import Pacman, SlowGhost, FastGhost, SleepingGhost, MutantGhost
 from model.Objects.background.Wall import Wall
 from model.utils.Utils import ImageUtils, BaseUtils
@@ -124,6 +124,13 @@ class CoinGenerator(StaticObjectCreator, MultipleObjectsGenerator):
 
     def __init__(self, block_width, block_height, field_object_width, field_object_height):
         StaticObjectCreator.__init__(self, block_width, block_height, field_object_width, field_object_height, (Coin,))
+        MultipleObjectsGenerator.__init__(self)
+
+
+class PointGenerator(StaticObjectCreator, MultipleObjectsGenerator):
+
+    def __init__(self, block_width, block_height, field_object_width, field_object_height):
+        StaticObjectCreator.__init__(self, block_width, block_height, field_object_width, field_object_height, (Point,))
         MultipleObjectsGenerator.__init__(self)
 
 

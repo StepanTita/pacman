@@ -1,7 +1,9 @@
 import pygame
 
 from enums import Direction
-from model.Objects.Sprites.Sprite import StupidGhost, SmartGhost
+from model.Objects.Interactable.Interactable import Coin, Point
+from model.Objects.Sprites.Sprite import StupidGhost, SmartGhost, Ghost
+from model.Objects.background.Wall import Wall
 
 
 class Controller:
@@ -13,6 +15,9 @@ class Controller:
         self._down = None
         self._collider = collider
         self._screen_field_mapper = screen_field_mapper
+
+    def set_gamestatus(self, gamestatus):
+        self._gamestatus = gamestatus
 
     def _update_buttons(self):
         keyinput = pygame.key.get_pressed()
@@ -88,10 +93,14 @@ class Controller:
         self._update_buttons()
         if self._any_control_key_pressed():
             self._move_sprite(sprite)
-            collided = self._collider.check_player_collisions(sprite, obstacles)
-            if collided:
+            collision = self._collider.check_player_collisions(sprite, obstacles)
+            if collision is Wall:
                 sprite.discard_move()
-            return collided
+            elif collision is Coin:
+                self._gamestatus.update_coins_score()
+            elif collision is Point:
+                self._gamestatus.update_points_score()
+            return collision is Wall
         return False
 
     def stupid_ghosts(self, ghosts, obstacles):
@@ -109,8 +118,14 @@ class Controller:
                 collided = True
                 ghost.find_sprite(sprite)
                 while collided:
-                    self._move_ghost(ghost, ghost.next_way())
+                    self._move_ghost(ghost, ghost.next_step())
                     collided = self._collider.check_ghost_collisions(ghost, obstacles)
                     if not collided:
                         break
                     ghost.discard_move()
+
+    def ghosts_player(self, sprite, ghosts):
+        collision = self._collider.check_player_collisions(sprite, ghosts)
+        if collision is Ghost and not sprite.is_invinsible():
+            sprite.make_invinsible()
+            self._gamestatus.change_status()

@@ -22,6 +22,7 @@ class PseudoField(Enum):
     SLOW_GHOST = 'S'
     SLEEPING_GHOST = 'Z'
     MUTANT_GHOST = 'M'
+    POINT = '.'
 
 
 class GhostsTypes(Enum):
@@ -29,3 +30,8 @@ class GhostsTypes(Enum):
     SLOW = 1
     FAST = 2
     SLEEPING = 3
+
+
+class HealthStatus(Enum):
+    OK = 0
+    BAD = 1

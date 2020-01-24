@@ -1,8 +1,11 @@
 from itertools import cycle
 
 import pygame
+import random
 
+import consts
 from enums import Direction
+from model.Screen.CustomScreen import ScreenObject
 from model.utils.Utils import ImageUtils
 
 
@@ -14,37 +17,22 @@ def create_history(func):
     return wrapper
 
 
-class FieldObject(pygame.sprite.Sprite):
+class FieldObject(ScreenObject):
 
     def __init__(self, images, x, y, width, height, block_width, block_height):
+        ScreenObject.__init__(self, x, y, width, height)
         self._images = ImageUtils.resize_images(images,
                                           target_width=width,
                                           target_height=height
                                           )
-        pygame.sprite.Sprite.__init__(self)
-        # if width < block_width and height < block_height:
-        #     self._rect = pygame.Rect(x + width // 2, y + height // 2, width, height)
-        # else:
+
         self._block_width = block_width
         self._block_height = block_height
-        self._rect = pygame.Rect(x, y, width, height)
-        self._states = cycle([])
+
+        self._states = cycle(self._images)
         self._current_state = None
 
-    def get_rect(self):
-        return self._rect
-
-    def get_width(self):
-        return self._rect.width
-
-    def get_height(self):
-        return self._rect.height
-
-    def x(self):
-        return self._rect.x
-
-    def y(self):
-        return self._rect.y
+        self.next_state()
 
     def current_state(self):
         return self._current_state
@@ -52,11 +40,17 @@ class FieldObject(pygame.sprite.Sprite):
     def next_state(self):
         self._current_state = next(self._states)
 
-    def field_x(self):
-        return self._rect.x // self.get_width()
+    def get_middle(self):
+        return self._rect.center
 
-    def field_y(self):
-        return self._rect.y // self.get_height()
+
+class MiddledFieldObject(FieldObject):
+    def __init__(self, images, x, y, width, height, block_width, block_height):
+        super().__init__(images, x, y, width, height, block_width, block_height)
+        if width < block_width and height < block_height:
+            self._rect = pygame.Rect(x + width // 2, y + height // 2, width, height)
+        else:
+            self._rect = pygame.Rect(x, y, width, height)
 
 
 class Sprite(FieldObject):
@@ -109,6 +103,9 @@ class Sprite(FieldObject):
     def collide(self, obstacle):
         return self._rect.colliderect(obstacle.get_rect())
 
+    def collidepoint(self, obstacle):
+        return self._rect.collidepoint(obstacle.get_middle())
+
     def discard_move(self):
         self._passed_horizontal -= abs(self._rect.x - self._old_rect.x)
         self._passed_vertical -= abs(self._rect.y - self._old_rect.y)
@@ -133,12 +130,26 @@ class Pacman(Sprite):
                  width, height, block_width, block_height):
         super().__init__(images, horizontal_speed, vertical_speed, x, y, width, height, block_width, block_height)
         self.update_direction(Direction.RIGHT)
+        self._is_invinsible = False
+        self._start_time = 0
+        self._invinsibility_length = consts.INVINSIBILITY_TIME
+
+    def make_invinsible(self):
+        self._is_invinsible = True
+        self._start_time = pygame.time.get_ticks()
+
+    def is_invinsible(self):
+        return self._is_invinsible
+
+    def check_invinsible(self, end_time):
+        if end_time - self._start_time >= self._invinsibility_length:
+            self._is_invinsible = False
 
 
 class Ghost(Sprite):
     def __init__(self, images, horizontal_speed, vertical_speed, x, y,
                  width, height, block_width, block_height):
-        super().__init__(images, horizontal_speed, vertical_speed, x, y, width, height, block_width, block_height)
+        super().__init__(images, horizontal_speed + 1, vertical_speed + 1, x, y, width, height, block_width, block_height)
         count_states = len(self._images) // 4
         self._up = cycle(self._images[:count_states])
         self._right = cycle(self._images[count_states:2 * count_states])
@@ -184,25 +195,41 @@ class SmartGhost(Ghost):
     def __init__(self, images, horizontal_speed, vertical_speed, x, y, width, height, block_width, block_height):
         super().__init__(images, horizontal_speed, vertical_speed, x, y, width, height, block_width, block_height)
         self._ways = iter([])
+        self._prev_step = None
+        self._counter = {Direction.LEFT: Direction.RIGHT,
+                         Direction.RIGHT: Direction.LEFT,
+                         Direction.UP: Direction.DOWN,
+                         Direction.DOWN: Direction.UP}
 
     def _dist_manhattan(self, x, y, sprite):
         return abs(sprite.x() - x) + abs(sprite.y() - y)
 
-    def find_sprite(self, sprite):
-        distances = [(self._dist_manhattan(self.x() + sprite.speed_horizontal, self.y(), sprite), Direction.RIGHT),
-                     (self._dist_manhattan(self.x() - self.speed_horizontal, self.y(), sprite), Direction.LEFT),
-                     (self._dist_manhattan(self.x(), self.y() - self.speed_vertical, sprite), Direction.UP),
-                     (self._dist_manhattan(self.x(), self.y() + self.speed_vertical, sprite), Direction.DOWN)]
-        self._ways = iter([way[1] for way in sorted(distances, key=lambda x: x[0])])
+    def _dist_euclidian(self, x, y, sprite):
+        x1 = sprite.x() - x
+        y1 = sprite.y() - y
+        return x1**2 + y1**2
 
-    def next_way(self):
-        return next(self._ways)
+    def find_sprite(self, sprite):
+        dist = self._dist_manhattan
+        if random.randint(0, 1):
+            dict = self._dist_euclidian
+        distances = [(dist(self.x() + sprite.speed_horizontal, self.y(), sprite), Direction.RIGHT),
+                     (dist(self.x() - self.speed_horizontal, self.y(), sprite), Direction.LEFT),
+                     (dist(self.x(), self.y() - self.speed_vertical, sprite), Direction.UP),
+                     (dist(self.x(), self.y() + self.speed_vertical, sprite), Direction.DOWN)]
+        ways = [way[1] for way in sorted(distances, key=lambda x: x[0]) if way[1] != self._prev_step]
+        self._ways = iter(ways)
+
+    def next_step(self):
+        next_step = next(self._ways)
+        self._prev_step = self._counter[next_step]
+        return next_step
 
 
 class SlowGhost(SmartGhost):
     def __init__(self, images, horizontal_speed, vertical_speed, x, y,
                  width, height, block_width, block_height):
-        super().__init__(images, horizontal_speed + 1, vertical_speed + 1, x, y, width, height, block_width, block_height)
+        super().__init__(images, horizontal_speed, vertical_speed, x, y, width, height, block_width, block_height)
 
 
 class FastGhost(StupidGhost):
