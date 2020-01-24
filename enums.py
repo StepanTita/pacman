@@ -23,6 +23,10 @@ class PseudoField(Enum):
     SLEEPING_GHOST = 'Z'
     MUTANT_GHOST = 'M'
     POINT = '.'
+    STRAW = '*'
+    RASP = '&'
+    LEMON = '@'
+    PEAR = '8'
 
 
 class GhostsTypes(Enum):

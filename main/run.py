@@ -9,7 +9,7 @@ from model.utils.Utils import FileUtils, BaseUtils
 
 
 def main():
-    pygame.font.init()
+    pygame.init()
 
     # Event Initializer
     event_initializer = EventsInitializer()
@@ -28,10 +28,22 @@ def main():
     walls_generator = objects_initializer.init_walls_generator()
     coins_generator = objects_initializer.init_coins_generator()
     points_generator = objects_initializer.init_points_generator()
+    straw_generator = objects_initializer.init_straw_generator()
+    rasp_generator = objects_initializer.init_rasp_generator()
+    lemon_generator = objects_initializer.init_lemon_generator()
+    pear_generator = objects_initializer.init_pear_generator()
 
     # Init field
     field_initializer = FieldInitializer()
-    field = field_initializer.init_field(pacman_generator, ghosts_generator, walls_generator, coins_generator, points_generator)
+    field = field_initializer.init_field(pacman_generator,
+                                         ghosts_generator,
+                                         walls_generator,
+                                         coins_generator,
+                                         points_generator,
+                                         straw_generator,
+                                         rasp_generator,
+                                         lemon_generator,
+                                         pear_generator)
     field.fill(rows_count=rows_count, cols_count=cols_count, pseudo_field=pseudo_field)
     field.set_instructions(
         BaseUtils.create_instructions(fast_ghost=Dependencies.load_instructions(path=consts.FAST_INSTRUCTIONS),
@@ -67,22 +79,7 @@ def main():
     game.set_controller(controller)
     game.set_screen_field_mapper(screen_field_mapper)
 
-    pygame.init()
     game.run()
-
-
-def test():
-    import random as rd
-    SIZE_X = 720
-    SIZE_Y = 480
-    STEP = 5
-
-    q_table = {}
-    for x1 in range(-SIZE_X + 1, SIZE_X, STEP):
-        for y1 in range(-SIZE_Y + 1, SIZE_Y, STEP):
-            for x2 in range(-SIZE_X + 1, SIZE_X, STEP):
-                for y2 in range(-SIZE_Y + 1, SIZE_Y, STEP):
-                    q_table[((x1, y1), (x2, y2))] = rd.randint(-5, 0)
 
 
 if __name__ == '__main__':

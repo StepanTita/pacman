@@ -1,6 +1,4 @@
-from enums import PseudoField
-from model.Objects.Interactable.Interactable import Coin, Point, Interactable
-from model.Objects.Sprites.Sprite import Ghost
+from model.Objects.Interactable.Interactable import Interactable
 from model.Objects.background.Wall import Wall
 
 
@@ -16,20 +14,7 @@ class Collider:
         return None
 
     def check_player_collisions(self, character, obstacles):
-        collision = self._has_collisions(character, obstacles)
-        if collision is None:
-            return None
-        elif type(collision) is Wall:
-            return Wall
-        elif type(collision) is Coin:
-            obstacles.remove(collision)
-            return Coin
-        elif type(collision) is Point:
-            obstacles.remove(collision)
-            return Point
-        elif issubclass(type(collision), Ghost):
-            return Ghost
-        return False
+        return self._has_collisions(character, obstacles)
 
     def check_ghost_collisions(self, ghost, obstacles):
         collision = self._has_collisions(ghost, obstacles)

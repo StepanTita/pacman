@@ -3,10 +3,14 @@ from itertools import cycle
 import pygame
 import random
 
+from pygame.surface import Surface
+
 import consts
 from enums import Direction
+from model.Dependencies.Dependencies import Dependencies
 from model.Screen.CustomScreen import ScreenObject
 from model.utils.Utils import ImageUtils
+from view.Color import Color
 
 
 def create_history(func):
@@ -29,6 +33,7 @@ class FieldObject(ScreenObject):
         self._block_width = block_width
         self._block_height = block_height
 
+        self._img_states = self._images
         self._states = cycle(self._images)
         self._current_state = None
 
@@ -63,16 +68,11 @@ class Sprite(FieldObject):
         self.speed_horizontal = horizontal_speed
         self.speed_vertical = vertical_speed
 
-        self._states = cycle(self._images)
-        self._current_state = None
-
         self._passed_horizontal = 0
         self._passed_vertical = 0
 
         self.old_moving_direction = None
         self.moving_direction = None
-
-        self.next_state()
 
     @create_history
     def move(self, dx=0, dy=0):
@@ -98,7 +98,7 @@ class Sprite(FieldObject):
 
     def update_direction(self, new_dir):
         self.moving_direction = new_dir
-        self._states = cycle(ImageUtils.rotate_images(self._images, new_dir.value))
+        self._states = cycle(ImageUtils.rotate_images(self._img_states, new_dir.value))
 
     def collide(self, obstacle):
         return self._rect.colliderect(obstacle.get_rect())
@@ -136,6 +136,10 @@ class Pacman(Sprite):
 
     def make_invinsible(self):
         self._is_invinsible = True
+
+        self._img_states = self._read_image()
+        self._states = cycle(self._img_states)
+        self.update_direction(self.moving_direction)
         self._start_time = pygame.time.get_ticks()
 
     def is_invinsible(self):
@@ -144,12 +148,25 @@ class Pacman(Sprite):
     def check_invinsible(self, end_time):
         if end_time - self._start_time >= self._invinsibility_length:
             self._is_invinsible = False
+            self._img_states = self._images
+            self._states = cycle(self._img_states)
+            self.update_direction(self.moving_direction)
+
+    def _read_image(self, img=consts.PACMAN, img_pos=consts.ALL_SPRITE_POS):
+        return ImageUtils.resize_images(
+            ImageUtils.crop_image(
+                base_img=Dependencies.load_img(img),
+                img_pos=img_pos
+            ),
+            target_width=self.get_width(),
+            target_height=self.get_height()
+        )
 
 
 class Ghost(Sprite):
     def __init__(self, images, horizontal_speed, vertical_speed, x, y,
                  width, height, block_width, block_height):
-        super().__init__(images, horizontal_speed + 1, vertical_speed + 1, x, y, width, height, block_width, block_height)
+        super().__init__(images, horizontal_speed, vertical_speed, x, y, width, height, block_width, block_height)
         count_states = len(self._images) // 4
         self._up = cycle(self._images[:count_states])
         self._right = cycle(self._images[count_states:2 * count_states])
@@ -212,7 +229,7 @@ class SmartGhost(Ghost):
     def find_sprite(self, sprite):
         dist = self._dist_manhattan
         if random.randint(0, 1):
-            dict = self._dist_euclidian
+            dist = self._dist_euclidian
         distances = [(dist(self.x() + sprite.speed_horizontal, self.y(), sprite), Direction.RIGHT),
                      (dist(self.x() - self.speed_horizontal, self.y(), sprite), Direction.LEFT),
                      (dist(self.x(), self.y() - self.speed_vertical, sprite), Direction.UP),
@@ -238,10 +255,24 @@ class FastGhost(StupidGhost):
         super().__init__(images, horizontal_speed * 2, vertical_speed * 2, x, y, width, height, block_width, block_height)
 
 
-class SleepingGhost(Ghost):
+class SleepingGhost(SmartGhost):
     def __init__(self, images, horizontal_speed, vertical_speed, x, y,
                  width, height, block_width, block_height):
         super().__init__(images, horizontal_speed, vertical_speed, x, y, width, height, block_width, block_height)
+
+        images = self._read_image()
+        self._left = cycle([images[0]])
+        self._right = cycle([images[1]])
+
+    def _read_image(self, img=consts.GHOSTS, img_pos=consts.BASE_INV_POS):
+        return ImageUtils.resize_images(
+            ImageUtils.crop_image(
+                base_img=Dependencies.load_img(img),
+                img_pos=img_pos
+            ),
+            target_width=self.get_width(),
+            target_height=self.get_height()
+        )
 
 
 class MutantGhost(StupidGhost):

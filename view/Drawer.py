@@ -99,6 +99,6 @@ class GameStatusDrawer:
 
         score_blocks = self._gamestatus.get_current_score()
         self._draw_blocks(screen, score_blocks)
-        #
-        # bonus_blocks = self._gamestatus.get_bonuses()
-        # self._draw_blocks(screen, bonus_blocks)
+
+        bonus_blocks = self._gamestatus.get_current_bonuses()
+        self._draw_blocks(screen, bonus_blocks)

@@ -1,7 +1,7 @@
 import pygame
 
 from enums import Direction
-from model.Objects.Interactable.Interactable import Coin, Point
+from model.Objects.Interactable.Interactable import Coin, Point, Pear, Rasp, Lemon, Straw
 from model.Objects.Sprites.Sprite import StupidGhost, SmartGhost, Ghost
 from model.Objects.background.Wall import Wall
 
@@ -94,14 +94,38 @@ class Controller:
         if self._any_control_key_pressed():
             self._move_sprite(sprite)
             collision = self._collider.check_player_collisions(sprite, obstacles)
-            if collision is Wall:
+            if type(collision) is Wall:
                 sprite.discard_move()
-            elif collision is Coin:
-                self._gamestatus.update_coins_score()
-            elif collision is Point:
-                self._gamestatus.update_points_score()
-            return collision is Wall
+            return type(collision) is Wall
         return False
+
+    def player_game_group(self, sprite, groups):
+        if self._any_control_key_pressed():
+            for obstacles in groups:
+                #self._move_sprite(sprite)
+                collision = self._collider.check_player_collisions(sprite, obstacles)
+
+                if type(collision) is Coin:
+                    obstacles.remove(collision)
+                    self._gamestatus.update_coins_score()
+                elif type(collision) is Point:
+                    obstacles.remove(collision)
+                    self._gamestatus.update_points_score()
+                elif type(collision) is Pear:
+                    obstacles.remove(collision)
+                    self._gamestatus.update_bonuses(Pear)
+                    sprite.make_invinsible()
+                elif type(collision) is Rasp:
+                    obstacles.remove(collision)
+                    self._gamestatus.update_bonuses(Rasp)
+
+                elif type(collision) is Lemon:
+                    obstacles.remove(collision)
+                    self._gamestatus.update_bonuses(Lemon)
+
+                elif type(collision) is Straw:
+                    obstacles.remove(collision)
+                    self._gamestatus.update_bonuses(Straw)
 
     def stupid_ghosts(self, ghosts, obstacles):
         for ghost in ghosts:
@@ -126,6 +150,6 @@ class Controller:
 
     def ghosts_player(self, sprite, ghosts):
         collision = self._collider.check_player_collisions(sprite, ghosts)
-        if collision is Ghost and not sprite.is_invinsible():
+        if issubclass(type(collision), Ghost) and not sprite.is_invinsible():
             sprite.make_invinsible()
             self._gamestatus.change_status()

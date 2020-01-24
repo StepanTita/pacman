@@ -3,15 +3,27 @@ from model.Objects.Sprites.Sprite import FastGhost, MutantGhost
 
 
 class Field:
-    def __init__(self, pacman_generator, ghosts_generator, walls_generator, coins_generator, points_generator):
+    def __init__(self, pacman_generator,
+                 ghosts_generator,
+                 walls_generator,
+                 coins_generator,
+                 points_generator,
+                 straw_generator,
+                 rasp_generator,
+                 lemon_generator,
+                 pear_generator):
         self._pacman_generator = pacman_generator
         self._ghosts_generator = ghosts_generator
         self._walls_generator = walls_generator
         self._coins_generator = coins_generator
         self._points_generator = points_generator
+        self._straw_generator = straw_generator
+        self._rasp_generator = rasp_generator
+        self._lemon_generator = lemon_generator
+        self._pear_generator = pear_generator
 
     def get_container(self):
-        return self.get_coins(), self.get_points()
+        return self.get_coins(), self.get_points(), self.get_straw(), self.get_rasp(), self.get_lemon(), self.get_pear()
 
     def get_pacman(self):
         return self._pacman_generator.get_field_object()
@@ -27,6 +39,18 @@ class Field:
 
     def get_points(self):
         return self._points_generator.get_field_objects()
+
+    def get_straw(self):
+        return self._straw_generator.get_field_objects()
+
+    def get_lemon(self):
+        return self._lemon_generator.get_field_objects()
+
+    def get_rasp(self):
+        return self._rasp_generator.get_field_objects()
+
+    def get_pear(self):
+        return self._pear_generator.get_field_objects()
 
     def set_instructions(self, named_instructions):
         for ghost in self.get_ghosts():
@@ -49,10 +73,20 @@ class Field:
                     self._field[i][j] = self._coins_generator.create(i, j)
                 elif pseudo_field[i][j] == PseudoField.POINT.value:
                     self._field[i][j] = self._points_generator.create(i, j)
+                elif pseudo_field[i][j] == PseudoField.STRAW.value:
+                    self._field[i][j] = self._straw_generator.create(i, j)
+                elif pseudo_field[i][j] == PseudoField.RASP.value:
+                    self._field[i][j] = self._rasp_generator.create(i, j)
+                elif pseudo_field[i][j] == PseudoField.LEMON.value:
+                    self._field[i][j] = self._lemon_generator.create(i, j)
+                elif pseudo_field[i][j] == PseudoField.PEAR.value:
+                    self._field[i][j] = self._pear_generator.create(i, j)
+
                 elif pseudo_field[i][j] == PseudoField.PACMAN.value:
                     self._field[i][j] = self._pacman_generator.create(i, j)
                 elif pseudo_field[i][j] == PseudoField.GHOST.value:
                     self._field[i][j] = self._ghosts_generator.create(i, j)
+
                 elif pseudo_field[i][j] == PseudoField.FAST_GHOST.value:
                     self._ghosts_generator.set_type(GhostsTypes.FAST.value)
                     self._field[i][j] = self._ghosts_generator.create(i, j)
@@ -67,9 +101,17 @@ class Field:
                     self._field[i][j] = self._ghosts_generator.create(i, j)
 
         self._pacman_generator.generate(self)
+
         self._walls_generator.generate(self)
+
         self._coins_generator.generate(self)
         self._points_generator.generate(self)
+
+        self._straw_generator.generate(self)
+        self._rasp_generator.generate(self)
+        self._lemon_generator.generate(self)
+        self._pear_generator.generate(self)
+
         self._ghosts_generator.generate(self)
 
     def __getitem__(self, i):

@@ -9,9 +9,10 @@ from model.Game import Game
 from model.GameStatus.GameStatus import GameStatus
 from model.Objects.Field import Field
 from model.Objects.GameStatusBlocks.GameStatusBlocks import HealthStatusBlock, StatusText, ScoreStatusBlock, \
-    ScoreStatusTextBlock
+    ScoreStatusTextBlock, BonusStatusBlock
+from model.Objects.Interactable.Interactable import Rasp, Lemon, Straw, Pear
 from model.Objects.ObjectsGenerators.ObjectsGenerators import WallGenerator, CoinGenerator, PacmanGenerator, \
-    GhostGenerator, PointGenerator
+    GhostGenerator, PointGenerator, StrawGenerator, RaspGenerator, LemonGenerator, PearGenerator
 from model.Gameplay.Gameplay import Collider
 from model.Screen.CustomScreen import CustomScreen
 from view.Drawer import Drawer, SpriteDrawer, ContainerDrawer, GhostDrawer, WallDrawer, GameStatusDrawer
@@ -26,8 +27,25 @@ class EventsInitializer:
 
 
 class FieldInitializer:
-    def init_field(self, pacman_generator, ghosts_generator, walls_generator, coins_generator, points_generator):
-        return Field(pacman_generator, ghosts_generator, walls_generator, coins_generator, points_generator)
+    def init_field(self,
+                   pacman_generator,
+                   ghosts_generator,
+                   walls_generator,
+                   coins_generator,
+                   points_generator,
+                   straw_generator,
+                   rasp_generator,
+                   lemon_generator,
+                   pear_generator):
+        return Field(pacman_generator,
+                     ghosts_generator,
+                     walls_generator,
+                     coins_generator,
+                     points_generator,
+                     straw_generator,
+                     rasp_generator,
+                     lemon_generator,
+                     pear_generator)
 
 
 class ObjectsInitializer:
@@ -61,10 +79,34 @@ class ObjectsInitializer:
         return coins_generator
 
     def init_points_generator(self, point_img=consts.POINTS, pos_img=consts.BASE_POINT_POS,
-                             field_object_width=consts.POINT_WIDTH, field_object_height=consts.POINT_HEIGHT):
+                              field_object_width=consts.POINT_WIDTH, field_object_height=consts.POINT_HEIGHT):
         points_generator = self._init_static_generator(PointGenerator, point_img, pos_img,
-                                                      field_object_width, field_object_height)
+                                                       field_object_width, field_object_height)
         return points_generator
+
+    def init_straw_generator(self, straw_img=consts.STRAW, pos_img=consts.BASE_STRAW_POS,
+                             field_object_width=consts.PACMAN_WIDTH, field_object_height=consts.PACMAN_HEIGHT):
+        straw_generator = self._init_static_generator(StrawGenerator, straw_img, pos_img,
+                                                      field_object_width, field_object_height)
+        return straw_generator
+
+    def init_rasp_generator(self, rasp_img=consts.RASP, pos_img=consts.BASE_RASP_POS,
+                            field_object_width=consts.PACMAN_WIDTH, field_object_height=consts.PACMAN_HEIGHT):
+        rasp_generator = self._init_static_generator(RaspGenerator, rasp_img, pos_img,
+                                                     field_object_width, field_object_height)
+        return rasp_generator
+
+    def init_lemon_generator(self, lemon_img=consts.LEMON, pos_img=consts.BASE_LEMON_POS,
+                            field_object_width=consts.PACMAN_WIDTH, field_object_height=consts.PACMAN_HEIGHT):
+        lemon_generator = self._init_static_generator(LemonGenerator, lemon_img, pos_img,
+                                                     field_object_width, field_object_height)
+        return lemon_generator
+
+    def init_pear_generator(self, pear_img=consts.PEAR, pos_img=consts.BASE_PEAR_POS,
+                            field_object_width=consts.PACMAN_WIDTH, field_object_height=consts.PACMAN_HEIGHT):
+        pear_generator = self._init_static_generator(PearGenerator, pear_img, pos_img,
+                                                     field_object_width, field_object_height)
+        return pear_generator
 
     def _init_moveable_generator(self, GeneratorType, img, pos_img,
                                  field_object_width, field_object_height,
@@ -96,7 +138,7 @@ class ObjectsInitializer:
 
     def _init_health(self, x, y, width, height):
         health_text_block = StatusText(x + width // 16, y + height // 5, width, height, "Health: ")
-        health_blocks = [HealthStatusBlock(x + width * (i + 1), y - height // 6, width, height) for i in
+        health_blocks = [HealthStatusBlock(x + width * (i + 1), y - height // 7, width, height) for i in
                          range(consts.HEALTH)]
         for health_block in health_blocks:
             health_block.init_health_image(heart_img=consts.HEART, heart_pos=consts.BASE_HEART_POS,
@@ -106,24 +148,46 @@ class ObjectsInitializer:
     def _init_score(self, x, y, width, height):
         point_block = ScoreStatusBlock(x, y, width, height)
         point_block.init_image(img=consts.POINTS, img_pos=consts.BASE_POINT_POS)
-        point_text_block = ScoreStatusTextBlock(x + width - width // 4, y + height // 6, width, height)
+        point_text_block = ScoreStatusTextBlock(x + width - width // 4, y + height // 7, width, height)
         coin_block = ScoreStatusBlock(x + 2 * width + width // 3, y + height // 4, width // 2, height // 2)
         coin_block.init_image(img=consts.COINS, img_pos=consts.BASE_COIN_POS)
-        coin_text_block = ScoreStatusTextBlock(x + 3 * width, y + height // 6, width, height)
+        coin_text_block = ScoreStatusTextBlock(x + 3 * width, y + height // 7, width, height)
 
         return point_block, point_text_block, coin_block, coin_text_block
+
+    def _init_bonus(self, x, y, width, height):
+        rasp_block = BonusStatusBlock(x, y + height // 4, width // 2, height // 2)
+        rasp_block.init_image(img=consts.RASP, img_pos=consts.BASE_RASP_POS)
+        rasp_block.init_nothing_img(img=consts.CROSS, img_pos=consts.BASE_CROSS_POS)
+
+        lemon_block = BonusStatusBlock(x + width - width // 4, y + height // 4, width // 2, height // 2)
+        lemon_block.init_image(img=consts.LEMON, img_pos=consts.BASE_LEMON_POS)
+        lemon_block.init_nothing_img(img=consts.CROSS, img_pos=consts.BASE_CROSS_POS)
+
+        straw_block = BonusStatusBlock(x + width + width // 2, y + height // 4, width // 2, height // 2)
+        straw_block.init_image(img=consts.STRAW, img_pos=consts.BASE_STRAW_POS)
+        straw_block.init_nothing_img(img=consts.CROSS, img_pos=consts.BASE_CROSS_POS)
+
+        pear_block = BonusStatusBlock(x + 2 * width + width // 4, y + height // 4, width // 2, height // 2)
+        pear_block.init_image(img=consts.PEAR, img_pos=consts.BASE_PEAR_POS)
+        pear_block.init_nothing_img(img=consts.CROSS, img_pos=consts.BASE_CROSS_POS)
+
+        return {Rasp: rasp_block, Lemon: lemon_block, Straw: straw_block, Pear: pear_block}
 
     def init_gamestatus(self, x, y, width, height):
         health_blocks, health_text_block = self._init_health(x, y, width, height)
 
-        x += (consts.HEALTH + 1) * width
+        x += (consts.HEALTH + 1) * width + width // 5
 
         point_block, point_text_block, coin_block, coin_text_block = self._init_score(x, y, width, height)
+        x += 4 * width + width // 2 + width // 5
+
+        bonuses = self._init_bonus(x, y, width, height)
 
         gamestatus = GameStatus(consts.HEALTH,
                                 health_blocks, health_text_block,
                                 point_block, point_text_block,
-                                coin_block, coin_text_block)
+                                coin_block, coin_text_block, bonuses)
         return gamestatus
 
 

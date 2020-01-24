@@ -74,12 +74,29 @@ class ScoreStatusTextBlock(GameStatusBlock):
         self._status = text_font.render(str(score).rjust(4, '0'), False, (255, 255, 255))
 
 
-class ScoreStatusBlock(ImageStatusBlock):
+class StatusBlock(ImageStatusBlock):
     def __init__(self, x, y, width, height):
         super().__init__(x, y, width, height)
-        self._img = None
 
     def init_image(self, img, img_pos):
-        self._img = self._read_images(img, img_pos)[0]
+        self._status = self._read_images(img, img_pos)[0]
 
-        self._status = self._img
+
+class ScoreStatusBlock(StatusBlock):
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y, width, height)
+        self._nothing_img = None
+
+
+class BonusStatusBlock(StatusBlock):
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y, width, height)
+        self._image = None
+
+    def init_nothing_img(self, img, img_pos):
+        self._nothing_img = self._read_images(img, img_pos)[0]
+        self._image = self._status
+        self._status = self._nothing_img
+
+    def update_bonus(self):
+        self._status = self._image

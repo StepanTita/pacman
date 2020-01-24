@@ -25,6 +25,18 @@ class ScreenFieldMapper:
     def get_points(self):
         return self._field.get_points()
 
+    def get_straw(self):
+        return self._field.get_straw()
+
+    def get_lemon(self):
+        return self._field.get_lemon()
+
+    def get_rasp(self):
+        return self._field.get_rasp()
+
+    def get_pear(self):
+        return self._field.get_pear()
+
     def get_screen_width(self):
         return self._screen.get_width()
 

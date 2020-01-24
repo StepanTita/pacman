@@ -44,8 +44,8 @@ class Game:
     def _player_game(self):
         if not self._controller.player_game(self._screen_field_mapper.get_pacman(),
                                             self._screen_field_mapper.get_walls()):
-            self._controller.player_game(self._screen_field_mapper.get_pacman(), self._screen_field_mapper.get_coins())
-            self._controller.player_game(self._screen_field_mapper.get_pacman(), self._screen_field_mapper.get_points())
+            self._controller.player_game_group(self._screen_field_mapper.get_pacman(), self._screen_field_mapper.get_container())
+
         self._controller.ghosts_player(self._screen_field_mapper.get_pacman(), self._screen_field_mapper.get_ghosts())
         self._controller.stupid_ghosts(self._screen_field_mapper.get_ghosts(), self._screen_field_mapper.get_walls())
         self._controller.smart_ghosts(self._screen_field_mapper.get_pacman(),
