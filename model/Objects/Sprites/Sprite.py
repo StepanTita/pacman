@@ -112,45 +112,24 @@ class Sprite(FieldObject):
 
         self._rect = self._old_rect
 
-    def speed_up(self, times):
-        self.speed_horizontal *= times
-        self.speed_vertical *= times
-
-    def increase(self, times):
-        self._rect.width *= times
-        self._rect.height *= times
-
-    def decrease(self, times):
-        self._rect.width //= times
-        self._rect.height //= times
-
 
 class Pacman(Sprite):
     def __init__(self, images, horizontal_speed, vertical_speed, x, y,
                  width, height, block_width, block_height):
         super().__init__(images, horizontal_speed, vertical_speed, x, y, width, height, block_width, block_height)
         self.update_direction(Direction.RIGHT)
+
         self._is_invinsible = False
-        self._start_time = 0
+        self._speeded = False
+        self._breaker = False
+
         self._invinsibility_length = consts.INVINSIBILITY_TIME
+        self._speed_length = consts.SPEED_TIME
+        self._breaker_length = consts.BREAKER_TIME
 
-    def make_invinsible(self):
-        self._is_invinsible = True
-
-        self._img_states = self._read_image()
-        self._states = cycle(self._img_states)
-        self.update_direction(self.moving_direction)
-        self._start_time = pygame.time.get_ticks()
-
-    def is_invinsible(self):
-        return self._is_invinsible
-
-    def check_invinsible(self, end_time):
-        if end_time - self._start_time >= self._invinsibility_length:
-            self._is_invinsible = False
-            self._img_states = self._images
-            self._states = cycle(self._img_states)
-            self.update_direction(self.moving_direction)
+        self._inv_start_time = 0
+        self._speed_start_time = 0
+        self._break_start_time = 0
 
     def _read_image(self, img=consts.PACMAN, img_pos=consts.ALL_SPRITE_POS):
         return ImageUtils.resize_images(
@@ -161,6 +140,58 @@ class Pacman(Sprite):
             target_width=self.get_width(),
             target_height=self.get_height()
         )
+
+    def is_invinsible(self):
+        return self._is_invinsible
+
+    def is_speeded(self):
+        return self._speeded
+
+    def is_breaker(self):
+        return self._breaker
+
+    def make_invinsible(self):
+        self._is_invinsible = True
+
+        self._img_states = self._read_image()
+        self._states = cycle(self._img_states)
+        self.update_direction(self.moving_direction)
+        self._inv_start_time = pygame.time.get_ticks()
+
+    def make_breaker(self):
+        self._breaker = True
+        self.speed_down()
+        self._break_start_time = pygame.time.get_ticks()
+
+    def make_speed(self):
+        self._speeded = True
+        self.speed_up()
+        self._speed_start_time = pygame.time.get_ticks()
+
+    def speed_up(self, times=2):
+        self.speed_horizontal *= times
+        self.speed_vertical *= times
+
+    def speed_down(self, times=2):
+        self.speed_horizontal //= times
+        self.speed_vertical //= times
+
+    def check_invinsible(self, end_time):
+        if end_time - self._inv_start_time >= self._invinsibility_length:
+            self._is_invinsible = False
+            self._img_states = self._images
+            self._states = cycle(self._img_states)
+            self.update_direction(self.moving_direction)
+
+    def check_speed(self, end_time):
+        if end_time - self._speed_start_time >= self._speed_length:
+            self._speeded = False
+            self.speed_down()
+
+    def check_breaker(self, end_time):
+        if end_time - self._break_start_time >= self._breaker_length:
+            self._breaker = False
+            self.speed_up()
 
 
 class Ghost(Sprite):

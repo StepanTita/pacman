@@ -22,6 +22,12 @@ class Field:
         self._lemon_generator = lemon_generator
         self._pear_generator = pear_generator
 
+        self._total_coins = 0
+        self._coins_found = 0
+
+        self._total_points = 0
+        self._points_found = 0
+
     def get_container(self):
         return self.get_coins(), self.get_points(), self.get_straw(), self.get_rasp(), self.get_lemon(), self.get_pear()
 
@@ -52,6 +58,16 @@ class Field:
     def get_pear(self):
         return self._pear_generator.get_field_objects()
 
+    def coin_found(self):
+        self._coins_found += 1
+
+    def point_found(self):
+        self._points_found += 1
+
+    def is_victory(self):
+        return self._total_coins == self._coins_found and self._total_points == self._points_found
+
+
     def set_instructions(self, named_instructions):
         for ghost in self.get_ghosts():
             if type(ghost) is FastGhost:
@@ -71,8 +87,10 @@ class Field:
                     self._field[i][j] = self._walls_generator.create(i, j)
                 elif pseudo_field[i][j] == PseudoField.COIN.value:
                     self._field[i][j] = self._coins_generator.create(i, j)
+                    self._total_coins += 1
                 elif pseudo_field[i][j] == PseudoField.POINT.value:
                     self._field[i][j] = self._points_generator.create(i, j)
+                    self._total_points += 1
                 elif pseudo_field[i][j] == PseudoField.STRAW.value:
                     self._field[i][j] = self._straw_generator.create(i, j)
                 elif pseudo_field[i][j] == PseudoField.RASP.value:

@@ -36,10 +36,10 @@ else:
     POINT_HEIGHT = BLOCK_HEIGHT
     # --------- SPEED ------------
     PACMAN_SPEED = BLOCK_SIZE // 20
-    GHOSTS_SPEED = PACMAN_SPEED // 10
+    GHOSTS_SPEED = PACMAN_SPEED // 2
 
 # --------- PATHS -------------
-FIELD_NAME = 'maps/basic_map.txt'
+FIELD_NAME = 'maps/map_2.txt'
 PACMAN = 'assets/imgs/sprites.png'
 WALLS = 'assets/imgs/walls.png'
 COINS = 'assets/imgs/coin.png'
@@ -60,7 +60,7 @@ BASE_WALL_POS = ImagePosition(x1=5, x2=6, y1=3, y2=4, w=63, h=63)
 BASE_COIN_POS = ImagePosition(x1=0, x2=5, y1=0, y2=1, w=200, h=250)
 BASE_GHOST_POS = ImagePosition(x1=0, x2=8, y1=4, y2=8, w=128, h=128)
 BASE_INV_POS = ImagePosition(x1=4, x2=6, y1=3, y2=4, w=128, h=128)
-BASE_POINT_POS = ImagePosition(x1=4, x2=5, y1=0, y2=1, w=128, h=128)
+BASE_POINT_POS = ImagePosition(x1=5, x2=6, y1=0, y2=1, w=128, h=128)
 
 BASE_RASP_POS = ImagePosition(x1=4, x2=5, y1=1, y2=2, w=128, h=128)
 BASE_LEMON_POS = ImagePosition(x1=5, x2=6, y1=1, y2=2, w=128, h=128)
@@ -74,6 +74,8 @@ BASE_CROSS_POS = ImagePosition(x1=0, x2=1, y1=0, y2=1, w=240, h=240)
 GHOSTS_STATES = 8
 HEALTH = 3
 INVINSIBILITY_TIME = 2000
+SPEED_TIME = 5000
+BREAKER_TIME = 2000
 COIN_SCORE = 5
 POINT_SCORE = 1
 # --------- INSTRUCTIONS ------------

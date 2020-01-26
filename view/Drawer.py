@@ -1,3 +1,5 @@
+from pygame.surface import Surface
+
 from model.Objects.Sprites.Sprite import MutantGhost
 from .Color import Color
 import pygame
@@ -42,6 +44,28 @@ class Drawer:
         self._draw_ghosts()
         self._draw_walls()
         self._draw_gamestatus()
+
+    def draw_pause(self):
+        pause_font = pygame.font.SysFont('Comic Sans MS', 45)
+        bg = Surface((360, 120))
+        bg.fill(Color.BLACK)
+        textsurface = pause_font.render('PAUSED', False, Color.WHITE, bg)
+        self._screen.blit(textsurface, (self._screen.get_width() // 2, self._screen.get_height() // 2))
+
+    def draw_victory(self):
+        pause_font = pygame.font.SysFont('Comic Sans MS', 65)
+        textsurface = pause_font.render('Victory!', False, Color.WHITE)
+        self._screen.blit(textsurface, (self._screen.get_width() // 2 - self._screen.get_width() // 5,
+                                        self._screen.get_height() // 2 - self._screen.get_height() // 5))
+
+    def draw_gameover(self, score):
+        pause_font = pygame.font.SysFont('Comic Sans MS', 65)
+        textsurface = pause_font.render('Game over', False, Color.WHITE)
+        self._screen.blit(textsurface, (self._screen.get_width() // 2 - self._screen.get_width() // 5,
+                                        self._screen.get_height() // 2 - self._screen.get_height() // 5))
+        textsurface = pause_font.render(f'Score: {score}', False, Color.WHITE)
+        self._screen.blit(textsurface, (self._screen.get_width() // 2 - self._screen.get_width() // 5,
+                                        self._screen.get_height() // 2))
 
     def update(self):
         pygame.display.update()

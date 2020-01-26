@@ -67,3 +67,12 @@ class ScreenFieldMapper:
 
     def get_container(self):
         return self._field.get_container()
+
+    def coin_found(self):
+        self._field.coin_found()
+
+    def point_found(self):
+        self._field.point_found()
+
+    def is_victory(self):
+        return self._field.is_victory()

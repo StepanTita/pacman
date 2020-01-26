@@ -1,7 +1,7 @@
 import pygame
 
 import consts
-from enums import Mode, Direction
+from enums import Mode
 from model.Events.MoveEvent import PacmanMoveEvent, CoinTossEvent, GhostAnimEvent
 
 
@@ -38,8 +38,31 @@ class Game:
             end_time = pygame.time.get_ticks()
             pacman.check_invinsible(end_time)
 
+    def _check_speed(self):
+        pacman = self._screen_field_mapper.get_pacman()
+        if pacman.is_speeded():
+            end_time = pygame.time.get_ticks()
+            pacman.check_speed(end_time)
+
+    def _check_breaker(self):
+        pacman = self._screen_field_mapper.get_pacman()
+        if pacman.is_breaker():
+            end_time = pygame.time.get_ticks()
+            pacman.check_breaker(end_time)
+
     def _check_statuses(self):
         self._check_invincible()
+        self._check_speed()
+        self._check_breaker()
+
+    def _check_gameover(self):
+        if self._screen_field_mapper.is_victory():
+            self._drawer.draw_victory()
+            return True
+        elif self._controller.is_gameover():
+            self._drawer.draw_gameover(self._controller.score())
+            return True
+        return False
 
     def _player_game(self):
         if not self._controller.player_game(self._screen_field_mapper.get_pacman(),
@@ -73,12 +96,15 @@ class Game:
             else:
                 self._player_game()
 
-            # Draw objects ...
-            self._drawer.draw()
+            self._check_statuses()
+
+            paused = self._check_gameover()
+
+            if not paused:
+                # Draw objects ...
+                self._drawer.draw()
 
             # Update the screen
             self._drawer.update()
-
-            self._check_statuses()
 
         pygame.quit()

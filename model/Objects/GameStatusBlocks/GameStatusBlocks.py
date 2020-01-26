@@ -58,8 +58,11 @@ class HealthStatusBlock(ImageStatusBlock):
     def get_empty_heart(self):
         return self._empty_heart_img
 
-    def change_status(self):
+    def decrease_health(self):
         self._status = self.get_empty_heart()
+
+    def increase_health(self):
+        self._status = self.get_heart()
 
 
 class ScoreStatusTextBlock(GameStatusBlock):

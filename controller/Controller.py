@@ -16,6 +16,8 @@ class Controller:
         self._collider = collider
         self._screen_field_mapper = screen_field_mapper
 
+        self._paused = False
+
     def set_gamestatus(self, gamestatus):
         self._gamestatus = gamestatus
 
@@ -26,6 +28,14 @@ class Controller:
         self._right = keyinput[pygame.K_RIGHT]
         self._up = keyinput[pygame.K_UP]
         self._down = keyinput[pygame.K_DOWN]
+
+        pause = keyinput[pygame.K_p]
+        if pause:
+            self._paused = not self._paused
+
+    def is_paused(self):
+        self._update_buttons()
+        return self._paused
 
     def _any_control_key_pressed(self):
         return self._left or self._right or self._up or self._down
@@ -86,6 +96,12 @@ class Controller:
         elif next_step == Direction.DOWN:
             self._move_down(ghost)
 
+    def is_gameover(self):
+        return self._gamestatus.is_gameover()
+
+    def score(self):
+        return self._gamestatus.score()
+
     def auto_game(self):
         ...  # TODO
 
@@ -95,7 +111,10 @@ class Controller:
             self._move_sprite(sprite)
             collision = self._collider.check_player_collisions(sprite, obstacles)
             if type(collision) is Wall:
-                sprite.discard_move()
+                if sprite.is_breaker():
+                    obstacles.remove(collision)
+                else:
+                    sprite.discard_move()
             return type(collision) is Wall
         return False
 
@@ -107,9 +126,11 @@ class Controller:
 
                 if type(collision) is Coin:
                     obstacles.remove(collision)
+                    self._screen_field_mapper.coin_found()
                     self._gamestatus.update_coins_score()
                 elif type(collision) is Point:
                     obstacles.remove(collision)
+                    self._screen_field_mapper.point_found()
                     self._gamestatus.update_points_score()
                 elif type(collision) is Pear:
                     obstacles.remove(collision)
@@ -118,14 +139,15 @@ class Controller:
                 elif type(collision) is Rasp:
                     obstacles.remove(collision)
                     self._gamestatus.update_bonuses(Rasp)
-
+                    sprite.make_speed()
                 elif type(collision) is Lemon:
                     obstacles.remove(collision)
                     self._gamestatus.update_bonuses(Lemon)
-
+                    sprite.make_breaker()
                 elif type(collision) is Straw:
                     obstacles.remove(collision)
                     self._gamestatus.update_bonuses(Straw)
+                    self._gamestatus.increase_health()
 
     def stupid_ghosts(self, ghosts, obstacles):
         for ghost in ghosts:
@@ -152,4 +174,4 @@ class Controller:
         collision = self._collider.check_player_collisions(sprite, ghosts)
         if issubclass(type(collision), Ghost) and not sprite.is_invinsible():
             sprite.make_invinsible()
-            self._gamestatus.change_status()
+            self._gamestatus.decrease_health()

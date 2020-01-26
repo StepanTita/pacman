@@ -21,10 +21,16 @@ class GameStatus:
         self._coint_score_block = coint_score_block
         self._coins_score_text_block = coins_score_text_block
 
-    def change_status(self):
+    def decrease_health(self):
         if self._health > 0:
             self._health -= 1
-            self._health_blocks[self._health].change_status()
+            self._health_blocks[self._health].decrease_health()
+
+    def increase_health(self):
+        if self._health < 3:
+            self._health_blocks[self._health].increase_health()
+            self._health += 1
+
 
     def update_points_score(self):
         self._points_score += consts.POINT_SCORE
@@ -46,3 +52,9 @@ class GameStatus:
 
     def get_current_bonuses(self):
         return self._bonuses.values()
+
+    def is_gameover(self):
+        return self._health == 0
+
+    def score(self):
+        return self._points_score + self._coins_score
