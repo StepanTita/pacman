@@ -13,6 +13,14 @@ https://github.com/StepanTita/pacman/assets/44279105/57b858da-1699-4813-8a66-d3e
 - **Keyboard Controls:** Easy-to-use controls for navigating our maze.
 - **High Score Tracking:** Compete against yourself and keep setting new high scores!
 
+## 🍒 Game Elements:
+![14](https://github.com/StepanTita/pacman/assets/44279105/f7825c17-cfe4-41da-91c0-30b9af0c87cb)
+
+![15](https://github.com/StepanTita/pacman/assets/44279105/7b810483-0b04-4647-abb2-5badb156d833)
+
+![16](https://github.com/StepanTita/pacman/assets/44279105/ae88a94a-539a-426b-bdfc-55a25d185bde)
+
+
 ## 🚀 Getting Started:
 
 ### Prerequisites:
