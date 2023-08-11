@@ -4,6 +4,8 @@ Retro Python-made Pac-Man! Built using Pygame library, it offers classic gamepla
 
 ## 🎮 Demo:
 
+https://github.com/StepanTita/pacman/assets/44279105/57b858da-1699-4813-8a66-d3ef175afd5c
+
 ## 🌟 Features:
 
 - **Classic Gameplay:** Relive the original Pac-Man experience.
